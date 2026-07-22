@@ -21,11 +21,14 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import wpics.alcogait.R
 import wpics.alcogait.ui.theme.LightGray
+import kotlin.math.round
 
 @Composable
 fun GenericButton(
     onClick: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    buttonColor: Color = LightGray,
+    roundedCornerSize: Int = 50,
     content: @Composable () -> Unit
 ) {
     Box(
@@ -33,7 +36,7 @@ fun GenericButton(
             .size(width = 170.dp, height = 40.dp)
             .clickable( onClick = onClick)
             .dropShadow(
-                shape = RoundedCornerShape(50.dp),
+                shape = RoundedCornerShape(roundedCornerSize.dp),
                 shadow = Shadow(
                     radius = 4.dp,
                     spread = 0.dp,
@@ -42,7 +45,7 @@ fun GenericButton(
                 )
             )
             .dropShadow(
-                shape = RoundedCornerShape(50.dp),
+                shape = RoundedCornerShape(roundedCornerSize.dp),
                 shadow = Shadow(
                     radius = 13.dp,
                     spread = (-3).dp,
@@ -50,10 +53,10 @@ fun GenericButton(
                     offset = DpOffset(x = 0.dp, y = 7.dp)
                 )
             )
-            .clip(RoundedCornerShape(50.dp))
-            .background(LightGray, RoundedCornerShape(50.dp))
+            .clip(RoundedCornerShape(roundedCornerSize.dp))
+            .background(buttonColor, RoundedCornerShape(roundedCornerSize.dp))
             .innerShadow(
-                shape = RoundedCornerShape(50.dp),
+                shape = RoundedCornerShape(roundedCornerSize.dp),
                 shadow = Shadow(
                     radius = 0.dp,
                     color = Color.Black.copy(alpha = 0.2f),

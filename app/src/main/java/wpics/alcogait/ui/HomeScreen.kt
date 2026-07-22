@@ -104,6 +104,22 @@ fun HomeScreen() {
 
 
             // start button
+            Box(
+                modifier = Modifier
+                    .offset(x = 130.dp, y = 720.dp),
+            ){
+                GenericButton(
+                    onClick = { /* TODO */ },
+                    buttonColor = LightBlue,
+                    roundedCornerSize = 10
+                ) {
+                    Text(
+                        text = "START",
+                        color = LightPink,
+                        fontSize = 30.sp,
+                    )
+                }
+            }
 
         }
     }
