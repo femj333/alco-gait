@@ -35,7 +35,7 @@ class GaitAnalyzer(
         val variance = magnitudes.sumOf { (it - mean) * (it - mean) } / magnitudes.size
         return when {
             variance < 0.5 -> "SOBER"
-            variance < 1.0 -> "TISPY"
+            variance < 1.0 -> "TIPSY"
             variance < 1.5 -> "DRUNK"
             else -> "WASTED"
         }

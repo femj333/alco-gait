@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,9 +39,15 @@ import wpics.alcogait.ui.components.TopBar
 import wpics.alcogait.ui.theme.DarkBlue
 import wpics.alcogait.ui.theme.LightBlue
 import wpics.alcogait.ui.theme.LightPink
+import wpics.alcogait.viewmodels.HomeViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    viewModel: HomeViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -55,7 +63,7 @@ fun HomeScreen() {
                 .padding(padding)
         ) {
             // background layer
-            Background()
+            Background(stateBackground = uiState.drunkStateImage)
 
             // drunk state sign
             /* TODO -> change state based on readings */
@@ -64,7 +72,7 @@ fun HomeScreen() {
                     .align(Alignment.TopCenter)
                     .offset(y = 35.dp)
             ) {
-                DrunkStateSign()
+                DrunkStateSign(stateText = uiState.drunkStateText)
             }
 
             Row(
@@ -96,12 +104,12 @@ fun HomeScreen() {
                     .offset(x = 130.dp, y = 720.dp),
             ){
                 GenericButton(
-                    onClick = { /* TODO */ },
+                    onClick = { if (uiState.isRecording) viewModel.onStopClicked() else viewModel.onStartClicked() },
                     buttonColor = LightBlue,
                     roundedCornerSize = 10
                 ) {
                     Text(
-                        text = "START",
+                        text = if (uiState.isRecording) "STOP" else "START",
                         color = LightPink,
                         fontSize = 30.sp,
                     )
@@ -131,7 +139,9 @@ fun LyftImage(){
 }
 
 @Composable
-fun DrunkStateSign(){
+fun DrunkStateSign(
+    stateText: String
+){
     Box(
         modifier = Modifier
             .size(width = 275.dp, height = 110.dp)
@@ -196,7 +206,7 @@ fun DrunkStateSign(){
         }
 
         Text(
-            text = "SOBER",
+            text = stateText,
             color = LightPink,
             fontSize = 65.sp,
             modifier = Modifier
@@ -218,7 +228,7 @@ fun Circle() {
 
 
 @Composable
-fun Background() {
+fun Background(stateBackground: Int) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -228,7 +238,7 @@ fun Background() {
             painter = rememberDrawablePainter(
                 drawable = getDrawable(
                     LocalContext.current,
-                    R.drawable.sober
+                    stateBackground
                 )
             ),
             contentDescription = "Sober character animation",

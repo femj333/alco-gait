@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import wpics.alcogait.R
 import wpics.alcogait.data.GaitAnalyzer
 import wpics.alcogait.data.Walk
 import wpics.alcogait.data.WalkCSVWriter
@@ -34,7 +35,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     init {
         recorder.onAccelerometerSample = { data ->
             val label = analyzer.ingest(data)
-            _uiState.update { it.copy(drunkStateText = label) }
+            val background = when (label) {
+                "TIPSY" -> R.drawable.tipsy
+                "DRUNK" -> R.drawable.drunk
+                "WASTED" -> R.drawable.wasted
+                else -> R.drawable.sober
+            }
+            _uiState.update { it.copy(drunkStateText = label, drunkStateImage = background) }
         }
     }
 

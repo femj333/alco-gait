@@ -49,6 +49,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-drawablepainter:0.37.3")
     implementation("com.opencsv:opencsv:4.0")
     implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
