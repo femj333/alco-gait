@@ -28,7 +28,7 @@ class GaitAnalyzer(
     /** Returns the current drunk state label */
     private fun currentLabel(): String {
         // too little info
-        if (magnitudes.size < windowSize / 2) return "SOBER"
+        if (magnitudes.size < windowSize / 2) return "CALIBRATING"
 
         // compute variance of magnitude over window -> in place of ML model
         val mean = magnitudes.average()

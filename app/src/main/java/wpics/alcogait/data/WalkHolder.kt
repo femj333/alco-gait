@@ -27,7 +27,7 @@ class WalkHolder(
      * Finds the first walk type (in [allowedWalkTypes] order) that hasn't
      * been recorded yet, or null if every allowed walk type is already done
      */
-    val getNextWalkType: WalkType? = allowedWalkTypes.firstOrNull { !walkMap.containsKey(it) }
+    fun getNextWalkType(): WalkType? = allowedWalkTypes.firstOrNull { !walkMap.containsKey(it) }
 
     /** Whether a Walk has already been recorded for the given type */
     fun hasWalk(walkType: WalkType): Boolean {
