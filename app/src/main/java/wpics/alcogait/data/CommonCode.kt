@@ -3,6 +3,9 @@ package wpics.alcogait.data
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+/**
+ * Common code for the phone and wearable
+ */
 object CommonCode {
     const val DELAY_IN_MILLISECONDS = 5
 
