@@ -1,6 +1,7 @@
 package wpics.alcogait.data
 
 import android.util.Log
+import wpics.alcogait.R
 import kotlin.math.sqrt
 
 class GaitAnalyzer {
@@ -12,13 +13,15 @@ class GaitAnalyzer {
     }
 
     /** Returns the current drunk state label */
-    fun computeLabelAndReset(): String? {
+    fun computeDrunkStateAndReset(): Pair<String, Int>? {
         // no info
         if (magnitudes.isEmpty()) return null
 
         // compute variance of magnitude over window -> in place of ML model
         val mean = magnitudes.average()
         val variance = magnitudes.sumOf { (it - mean) * (it - mean) } / magnitudes.size
+
+        // arbitrary drunk state from variance
         val label =  when {
             variance < 0.5 -> "SOBER"
             variance < 2.0 -> "TIPSY"
@@ -26,7 +29,15 @@ class GaitAnalyzer {
             else -> "WASTED"
         }
 
+        val image = when (label) {
+            "SOBER" -> R.drawable.sober
+            "TIPSY" -> R.drawable.tipsy
+            "DRUNK" -> R.drawable.drunk
+            else -> R.drawable.wasted
+        }
+
+        val pair = Pair(label, image)
         magnitudes.clear()
-        return label
+        return pair
     }
 }

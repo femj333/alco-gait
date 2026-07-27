@@ -9,5 +9,6 @@ data class HomeUiState(
     val drunkStateImage: Int = R.drawable.sober,
     val currentWalk: Walk? = null,
     val saveError: Boolean = false,
-    val showMinRecordingAlert: Boolean = false
+    val showMinRecordingAlert: Boolean = false,
+    val elapsedMillis: Long = 0L
 )

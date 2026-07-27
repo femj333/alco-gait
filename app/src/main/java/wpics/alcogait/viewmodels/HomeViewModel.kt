@@ -24,9 +24,11 @@ import java.io.File
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
-    /* 20 second recordings */
     companion object {
+        // 20 second recordings
         private const val WINDOW_DURATION_MS = 20_000L
+        // stopwatch tick delay
+        private const val STOPWATCH_TICK_MS = 100L
     }
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -37,6 +39,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private var windowJob: Job? = null
     private var completedWindows = 0
+
+    private var stopwatchJob: Job? = null
+    private var recordingStartTime: Long = 0L
 
     private var walkHolder = WalkHolder(1)
     private var currentWalkType: WalkType? = WalkType.NORMAL
@@ -57,9 +62,21 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val walkType = currentWalkType ?: return
         val walk = Walk(walkHolder.walkNumber, bac = 0.0, walkType = walkType)
         recorder.startRecording(walk)
+
         completedWindows = 0
-        _uiState.update { it.copy(isRecording = true, currentWalk = walk, showMinRecordingAlert = false) }
+        recordingStartTime = System.currentTimeMillis()
+
+        _uiState.update {
+            it.copy(
+                isRecording = true,
+                currentWalk = walk,
+                showMinRecordingAlert = false,
+                elapsedMillis = 0L
+            )
+        }
+
         startWindowTimer()
+        startStopwatch()
     }
 
     private fun startWindowTimer() {
@@ -69,9 +86,28 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 // wait for window to complete
                 delay(WINDOW_DURATION_MS)
                 // compute drunk state
-                val label = analyzer.computeLabelAndReset()
+                val pair = analyzer.computeDrunkStateAndReset()
                 completedWindows++
-                if (label != null) _uiState.update { it.copy(drunkStateText = label) }
+                if (pair != null) {
+                    _uiState.update {
+                        it.copy(
+                            drunkStateText = pair.first,
+                            drunkStateImage = pair.second
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startStopwatch() {
+        stopwatchJob?.cancel()
+        stopwatchJob = viewModelScope.launch {
+            while (isActive) {
+                // get current elapsed time
+                val elapsed = System.currentTimeMillis() - recordingStartTime
+                _uiState.update { it.copy(elapsedMillis = elapsed) }
+                delay(STOPWATCH_TICK_MS)
             }
         }
     }
@@ -79,6 +115,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun onStopClicked() {
         windowJob?.cancel()
         windowJob = null
+        stopwatchJob?.cancel()
+        stopwatchJob = null
         recorder.stopRecording()
 
         // persist this walk, advance to next walk type
@@ -89,9 +127,22 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
         // under 20 seconds recorded, not enough data
         if (completedWindows == 0) {
-            _uiState.update { it.copy(isRecording = false, currentWalk = null, showMinRecordingAlert = true) }
+            _uiState.update {
+                it.copy(
+                    isRecording = false,
+                    currentWalk = null,
+                    showMinRecordingAlert = true,
+                    elapsedMillis = 0L
+                )
+            }
         } else { // at least one full window recorded
-            _uiState.update { it.copy(isRecording = false, currentWalk = null) }
+            _uiState.update {
+                it.copy(
+                    isRecording = false,
+                    currentWalk = null,
+                    elapsedMillis = 0L
+                )
+            }
         }
 
         currentWalkType = walkHolder.getNextWalkType()
@@ -123,6 +174,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     override fun onCleared() {
         windowJob?.cancel()
+        stopwatchJob?.cancel()
         recorder.unregisterListeners()
         super.onCleared()
     }

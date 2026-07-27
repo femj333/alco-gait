@@ -43,6 +43,14 @@ import wpics.alcogait.ui.theme.LightBlue
 import wpics.alcogait.ui.theme.LightPink
 import wpics.alcogait.viewmodels.HomeViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import java.util.Locale
+
+fun formatElapsed(millis: Long): String {
+    val totalSeconds = millis / 1000
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+    return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
+}
 
 @Composable
 fun HomeScreen(
@@ -68,7 +76,6 @@ fun HomeScreen(
             Background(stateBackground = uiState.drunkStateImage)
 
             // drunk state sign
-            /* TODO -> change state based on readings */
             Box(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -103,7 +110,8 @@ fun HomeScreen(
             // start button
             Box(
                 modifier = Modifier
-                    .offset(x = 130.dp, y = 720.dp),
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (-10).dp)
             ){
                 GenericButton(
                     onClick = { if (uiState.isRecording) viewModel.onStopClicked() else viewModel.onStartClicked() },
@@ -118,9 +126,25 @@ fun HomeScreen(
                 }
             }
 
+            // stopwatch
+            if(uiState.isRecording) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .offset(y = (-50).dp)
+                ) {
+                    Text (
+                        text = formatElapsed(uiState.elapsedMillis),
+                        color = LightPink,
+                        fontSize = 24.sp,
+                    )
+                }
+            }
+
         }
     }
 
+    // alert when recording is too short
     if (uiState.showMinRecordingAlert) {
         AlertDialog(
             onDismissRequest = { viewModel.dismissMinRecordingAlert() },
