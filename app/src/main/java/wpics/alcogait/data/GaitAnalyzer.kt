@@ -1,43 +1,32 @@
 package wpics.alcogait.data
 
+import android.util.Log
 import kotlin.math.sqrt
 
-class GaitAnalyzer(
-    // rolling window of samples
-    private val windowSize: Int = 200
-) {
-    private val magnitudes = ArrayDeque<Float>()
+class GaitAnalyzer {
+    private val magnitudes = mutableListOf<Float>()
 
-    /** Feed it the raw filtered X, Y, X strings already produced for the CSV row */
-    fun ingest(values: Array<String>): String {
-        // compute magnitude of acceleration vector
-        val x = values[1].toFloatOrNull() ?: return currentLabel()
-        val y = values[2].toFloatOrNull() ?: return currentLabel()
-        val z = values[3].toFloatOrNull() ?: return currentLabel()
-        val magnitude = sqrt(x * x + y * y + z * z)
-
-        // push the new value
-        magnitudes.addLast(magnitude)
-
-        // remove oldest value once over capacity
-        if (magnitudes.size > windowSize) magnitudes.removeFirst()
-
-        return currentLabel()
+    /** Add magnitude of one sample to the window */
+    fun addSample(x: Float, y: Float, z: Float) {
+        magnitudes.add(sqrt(x * x + y * y + z * z))
     }
 
     /** Returns the current drunk state label */
-    private fun currentLabel(): String {
-        // too little info
-        if (magnitudes.size < windowSize / 2) return "CALIBRATING"
+    fun computeLabelAndReset(): String? {
+        // no info
+        if (magnitudes.isEmpty()) return null
 
         // compute variance of magnitude over window -> in place of ML model
         val mean = magnitudes.average()
         val variance = magnitudes.sumOf { (it - mean) * (it - mean) } / magnitudes.size
-        return when {
+        val label =  when {
             variance < 0.5 -> "SOBER"
-            variance < 1.0 -> "TIPSY"
-            variance < 1.5 -> "DRUNK"
+            variance < 2.0 -> "TIPSY"
+            variance < 3.5 -> "DRUNK"
             else -> "WASTED"
         }
+
+        magnitudes.clear()
+        return label
     }
 }

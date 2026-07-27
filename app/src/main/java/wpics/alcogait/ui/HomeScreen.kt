@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -118,6 +120,20 @@ fun HomeScreen(
 
         }
     }
+
+    if (uiState.showMinRecordingAlert) {
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissMinRecordingAlert() },
+            title = { Text("Recording Too Short") },
+            text = { Text("You must record for at least 20 seconds before stopping") },
+            confirmButton =  {
+                TextButton(
+                    onClick = { viewModel.dismissMinRecordingAlert() }
+                )
+                { Text("Ok") }
+            }
+        )
+    }
 }
 
 @Composable
@@ -133,7 +149,7 @@ fun UberImage(){
 fun LyftImage(){
     Image(
         painter = painterResource(id = R.drawable.lyft_logo),
-        contentDescription = "Lyft lgog",
+        contentDescription = "Lyft logo",
         modifier = Modifier.size(width = 150.dp, height = 30.dp)
     )
 }
