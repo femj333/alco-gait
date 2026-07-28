@@ -192,7 +192,6 @@ fun DrunkStateSign(
             Modifier
                 .background(DarkBlue)
                 .size(width = 300.dp, height = 150.dp)
-
         )
 
         Box(
@@ -215,10 +214,10 @@ fun DrunkStateSign(
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .offset(x = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(9.5.dp),
 
                 ){
-                repeat(6) {
+                repeat(7) {
                     Circle()
                 }
             }
@@ -227,10 +226,10 @@ fun DrunkStateSign(
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .offset(x = 260.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(9.5.dp),
 
                 ){
-                repeat(6) {
+                repeat(7) {
                     Circle()
                 }
             }
