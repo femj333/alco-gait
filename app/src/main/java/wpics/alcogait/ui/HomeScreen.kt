@@ -73,20 +73,21 @@ fun HomeScreen(
                 .padding(padding)
         ) {
             // background layer
-            Background(stateBackground = uiState.drunkStateImage)
+            Background(stateBackground = uiState.drunkState.image)
 
             // drunk state sign
             Box(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .offset(y = 35.dp)
+                    .offset(y = 30.dp)
             ) {
-                DrunkStateSign(stateText = uiState.drunkStateText)
+                DrunkStateSign(stateText = uiState.drunkState.label, fontSize = uiState.drunkState.fontSize)
             }
 
             Row(
                 modifier = Modifier
-                    .offset(x = 25.dp, y = 180.dp),
+                    .align(Alignment.TopCenter)
+                    .offset(y = 180.dp),
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
             ){
                 // uber button
@@ -180,79 +181,94 @@ fun LyftImage(){
 
 @Composable
 fun DrunkStateSign(
-    stateText: String
+    stateText: String,
+    fontSize: Int
 ){
+
     Box(
-        modifier = Modifier
-            .size(width = 275.dp, height = 110.dp)
-            .dropShadow(
-                shape = RoundedCornerShape(10.dp),
-                shadow = Shadow(
-                    radius = 1.dp,
-                    spread = 2.dp,
-                    color = Color(0x40000000),
-                    offset = DpOffset(x = (-2).dp, 8.dp)
-                )
-            )
-            .clip(RoundedCornerShape(10.dp))
-            .background(color = LightBlue)
     ) {
-        Column(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .offset(x = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(11.dp),
+        // background to block out gif sign
+        Box(modifier =
+            Modifier
+                .background(DarkBlue)
+                .size(width = 300.dp, height = 150.dp)
 
-            ){
-            repeat(6) {
-                Circle()
-            }
-        }
+        )
 
-        Column(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .offset(x = 260.dp),
-            verticalArrangement = Arrangement.spacedBy(11.dp),
-
-            ){
-            repeat(6) {
-                Circle()
-            }
-        }
-
-        Row(
+        Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = 9.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                .size(width = 275.dp, height = 125.dp)
+                .dropShadow(
+                    shape = RoundedCornerShape(10.dp),
+                    shadow = Shadow(
+                        radius = 1.dp,
+                        spread = 2.dp,
+                        color = Color(0x40000000),
+                        offset = DpOffset(x = (-2).dp, 8.dp)
+                    )
+                )
+                .clip(RoundedCornerShape(10.dp))
+                .background(color = LightBlue)
+        ) {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .offset(x = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
 
-            ){
-            repeat(15) {
-                Circle()
+                ){
+                repeat(6) {
+                    Circle()
+                }
             }
-        }
 
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .offset(y = (-9).dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            Column(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .offset(x = 260.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
 
-            ){
-            repeat(15) {
-                Circle()
+                ){
+                repeat(6) {
+                    Circle()
+                }
             }
-        }
 
-        Text(
-            text = stateText,
-            color = LightPink,
-            fontSize = 65.sp,
-            modifier = Modifier
-                .align(Alignment.Center)
-        )
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .offset(y = 11.dp),
+                horizontalArrangement = Arrangement.spacedBy(9.5.dp),
+
+                ){
+                repeat(15) {
+                    Circle()
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (-11).dp),
+                horizontalArrangement = Arrangement.spacedBy(9.5.dp),
+
+                ){
+                repeat(15) {
+                    Circle()
+                }
+            }
+
+            Text(
+                text = stateText,
+                color = LightPink,
+                fontSize = fontSize.sp,
+                modifier = Modifier
+                    .align(Alignment.Center)
+            )
+        }
     }
+
 }
 
 

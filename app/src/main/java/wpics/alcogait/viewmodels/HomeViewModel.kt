@@ -20,6 +20,7 @@ import wpics.alcogait.data.WalkCSVWriter
 import wpics.alcogait.data.WalkHolder
 import wpics.alcogait.data.WalkSensorRecorder
 import wpics.alcogait.data.WalkType
+import wpics.alcogait.models.DrunkState
 import java.io.File
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
@@ -86,13 +87,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 // wait for window to complete
                 delay(WINDOW_DURATION_MS)
                 // compute drunk state
-                val pair = analyzer.computeDrunkStateAndReset()
+                val drunkState = analyzer.computeDrunkStateAndReset()
                 completedWindows++
-                if (pair != null) {
+                if (drunkState != null) {
                     _uiState.update {
                         it.copy(
-                            drunkStateText = pair.first,
-                            drunkStateImage = pair.second
+                            drunkState = drunkState
                         )
                     }
                 }
