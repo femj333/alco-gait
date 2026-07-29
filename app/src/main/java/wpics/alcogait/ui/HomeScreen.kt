@@ -21,6 +21,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,7 +46,20 @@ import wpics.alcogait.ui.theme.LightBlue
 import wpics.alcogait.ui.theme.LightPink
 import wpics.alcogait.viewmodels.HomeViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import wpics.alcogait.ui.components.MenuBar
 import java.util.Locale
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.width
+
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 
 fun formatElapsed(millis: Long): String {
     val totalSeconds = millis / 1000
@@ -57,91 +73,118 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var menuBarVisible by remember { mutableStateOf(false) }
 
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding(),
-        topBar = {
-            TopBar()
+    val menuWidth = 340.dp
+    val contentOffsetX by animateDpAsState(
+        targetValue = if (menuBarVisible) menuWidth else 0.dp,
+        label = "contentOffset"
+    )
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        // menu bar pullout
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .fillMaxHeight()
+                .width(menuWidth)
+        ) {
+            MenuBar()
         }
-    ) { padding ->
 
+        // main home screen, pushes over when menu bar is open
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .offset(x = contentOffsetX)
         ) {
-            // background layer
-            Background(stateBackground = uiState.drunkState.image)
-
-            // drunk state sign
-            Box(
+            Scaffold(
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .offset(y = 30.dp)
-            ) {
-                DrunkStateSign(stateText = uiState.drunkState.label, fontSize = uiState.drunkState.fontSize)
-            }
-
-            Row(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .offset(y = 180.dp),
-                horizontalArrangement = Arrangement.spacedBy(20.dp)
-            ){
-                // uber button
-                GenericButton(
-                    onClick = {/* TODO */},
-                    contentPadding = PaddingValues(top = 8.dp)
-                ) {
-                    UberImage()
+                    .fillMaxSize()
+                    .statusBarsPadding(),
+                topBar = {
+                    TopBar(onMenuClick = { menuBarVisible = !menuBarVisible })
                 }
+            ) { padding ->
 
-                // lyft button
-                GenericButton(
-                    onClick = {/* TODO */},
-                    contentPadding = PaddingValues(top = 4.dp)
-                ) {
-                    LyftImage()
-                }
-            }
-
-
-            // start button
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .offset(y = (-10).dp)
-            ){
-                GenericButton(
-                    onClick = { if (uiState.isRecording) viewModel.onStopClicked() else viewModel.onStartClicked() },
-                    buttonColor = LightBlue,
-                    roundedCornerSize = 10
-                ) {
-                    Text(
-                        text = if (uiState.isRecording) "STOP" else "START",
-                        color = LightPink,
-                        fontSize = 30.sp,
-                    )
-                }
-            }
-
-            // stopwatch
-            if(uiState.isRecording) {
                 Box(
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .offset(y = (-50).dp)
+                        .fillMaxSize()
+                        .padding(padding)
                 ) {
-                    Text (
-                        text = formatElapsed(uiState.elapsedMillis),
-                        color = LightPink,
-                        fontSize = 24.sp,
-                    )
+                    // background layer
+                    Background(stateBackground = uiState.drunkState.image)
+
+                    // drunk state sign
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .offset(y = 30.dp)
+                    ) {
+                        DrunkStateSign(stateText = uiState.drunkState.label, fontSize = uiState.drunkState.fontSize)
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .offset(y = 180.dp),
+                        horizontalArrangement = Arrangement.spacedBy(20.dp)
+                    ){
+                        // uber button
+                        GenericButton(
+                            onClick = {/* TODO */},
+                            contentPadding = PaddingValues(top = 8.dp)
+                        ) {
+                            UberImage()
+                        }
+
+                        // lyft button
+                        GenericButton(
+                            onClick = {/* TODO */},
+                            contentPadding = PaddingValues(top = 4.dp)
+                        ) {
+                            LyftImage()
+                        }
+                    }
+
+
+                    // start button
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .offset(y = (-10).dp)
+                    ){
+                        GenericButton(
+                            onClick = { if (uiState.isRecording) viewModel.onStopClicked() else viewModel.onStartClicked() },
+                            buttonColor = LightBlue,
+                            roundedCornerSize = 10
+                        ) {
+                            Text(
+                                text = if (uiState.isRecording) "STOP" else "START",
+                                color = LightPink,
+                                fontSize = 30.sp,
+                            )
+                        }
+                    }
+
+                    // stopwatch
+                    if(uiState.isRecording) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .offset(y = (-50).dp)
+                        ) {
+                            Text (
+                                text = formatElapsed(uiState.elapsedMillis),
+                                color = LightPink,
+                                fontSize = 24.sp,
+                            )
+                        }
+                    }
                 }
             }
-
         }
     }
 
