@@ -41,7 +41,10 @@ import wpics.alcogait.ui.theme.LightBlue
 import wpics.alcogait.ui.theme.LightPink
 
 @Composable
-fun MenuBar(){
+fun MenuBar(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+){
     Column(
         modifier = Modifier
             .statusBarsPadding()
@@ -51,29 +54,8 @@ fun MenuBar(){
             .padding(start = 10.dp, top = 30.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            // profile icon
-            ProfileIcon()
-
-            Column(
-                modifier = Modifier,
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ){
-                Text(
-                    text = "Fem",
-                    color = LightPink,
-                    fontSize = 25.sp
-                )
-                Text(
-                    text = "View Profile",
-                    color = LightPink,
-                    fontSize = 18.sp
-                )
-            }
-        }
+        // profile header
+        ProfileHeader()
 
         HorizontalDivider(
             modifier = Modifier
@@ -95,7 +77,7 @@ fun MenuBar(){
         NavigateItem("Rideshare", R.drawable.rideshare_icon)
 
         // toggle display character
-        DisplayCharacterToggle()
+        DisplayCharacterToggle(checked, onCheckedChange)
 
         // alcogait logo(?)
         AlcoGaitLogo()
@@ -128,25 +110,49 @@ fun NavigateItem(
 }
 
 @Composable
-fun ProfileIcon() {
-    Box(
-        modifier = Modifier
-            .size(60.dp)
-            .background(color = DarkBlue, shape = CircleShape)
-    ){
-        Icon(
-            painter = painterResource(id = R.drawable.profile_mask),
-            contentDescription = "Profile Icon",
-            tint = LightPink,
-            modifier = Modifier.size(50.dp).align(Alignment.Center)
-        )
+fun ProfileHeader() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        // profile icon
+        Box(
+            modifier = Modifier
+                .size(60.dp)
+                .background(color = DarkBlue, shape = CircleShape)
+        ){
+            Icon(
+                painter = painterResource(id = R.drawable.profile_mask),
+                contentDescription = "Profile Icon",
+                tint = LightPink,
+                modifier = Modifier.size(50.dp).align(Alignment.Center)
+            )
+        }
+
+        // profile name
+        Column(
+            modifier = Modifier,
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ){
+            Text(
+                text = "Fem",
+                color = LightPink,
+                fontSize = 25.sp
+            )
+            Text(
+                text = "View Profile",
+                color = LightPink,
+                fontSize = 18.sp
+            )
+        }
     }
 }
 
 @Composable
-fun DisplayCharacterToggle() {
-    var checked by remember { mutableStateOf(true) }
-
+fun DisplayCharacterToggle(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
     Row(
         modifier = Modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -154,15 +160,16 @@ fun DisplayCharacterToggle() {
     ) {
         Switch(
             checked = checked,
-            onCheckedChange = { checked = it },
+            onCheckedChange = onCheckedChange,
         )
 
         Text(
-            text = "Display Character: On",
+            text = if (checked) "Display Character: On" else "Display Character: Off",
             color = LightPink,
             fontSize = 22.sp
         )
     }
+
 }
 
 @Composable
