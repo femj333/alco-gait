@@ -58,8 +58,8 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.width
-
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 
 fun formatElapsed(millis: Long): String {
     val totalSeconds = millis / 1000
@@ -74,6 +74,7 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var menuBarVisible by remember { mutableStateOf(false) }
+    val density = LocalDensity.current
 
     val menuWidth = 340.dp
     val contentOffsetX by animateDpAsState(
@@ -98,7 +99,9 @@ fun HomeScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .offset(x = contentOffsetX)
+                .graphicsLayer(
+                    translationX = with(density) { contentOffsetX.toPx() }
+                )
         ) {
             Scaffold(
                 modifier = Modifier
