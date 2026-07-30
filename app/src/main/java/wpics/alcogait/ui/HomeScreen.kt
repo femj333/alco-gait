@@ -21,6 +21,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,7 +46,14 @@ import wpics.alcogait.ui.theme.LightBlue
 import wpics.alcogait.ui.theme.LightPink
 import wpics.alcogait.viewmodels.HomeViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import wpics.alcogait.ui.components.MenuBar
 import java.util.Locale
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
+import wpics.alcogait.viewmodels.HomeUiState
 
 fun formatElapsed(millis: Long): String {
     val totalSeconds = millis / 1000
@@ -57,91 +67,59 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var menuBarVisible by remember { mutableStateOf(false) }
+    var displayCharacter by remember { mutableStateOf(true) }
+    /* TODO -> add music */
+    var playMusic by remember { mutableStateOf(true) }
+    val density = LocalDensity.current
 
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding(),
-        topBar = {
-            TopBar()
+    val menuWidth = 340.dp
+    val contentOffsetX by animateDpAsState(
+        targetValue = if (menuBarVisible) menuWidth else 0.dp,
+        label = "contentOffset"
+    )
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        // menu bar pullout
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .fillMaxHeight()
+                .width(menuWidth)
+        ) {
+            MenuBar(
+                displayChecked = displayCharacter,
+                onDisplayCheckedChange = { displayCharacter = it },
+                musicChecked = playMusic,
+                onMusicCheckedChange = { playMusic = it }
+            )
         }
-    ) { padding ->
 
+        // main home screen, pushes over when menu bar is open
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .graphicsLayer(
+                    translationX = with(density) { contentOffsetX.toPx() }
+                )
         ) {
-            // background layer
-            Background(stateBackground = uiState.drunkState.image)
-
-            // drunk state sign
-            Box(
+            Scaffold(
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .offset(y = 30.dp)
-            ) {
-                DrunkStateSign(stateText = uiState.drunkState.label, fontSize = uiState.drunkState.fontSize)
-            }
-
-            Row(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .offset(y = 180.dp),
-                horizontalArrangement = Arrangement.spacedBy(20.dp)
-            ){
-                // uber button
-                GenericButton(
-                    onClick = {/* TODO */},
-                    contentPadding = PaddingValues(top = 8.dp)
-                ) {
-                    UberImage()
+                    .fillMaxSize()
+                    .statusBarsPadding(),
+                topBar = {
+                    TopBar(onMenuClick = { menuBarVisible = !menuBarVisible })
                 }
+            ) { padding ->
 
-                // lyft button
-                GenericButton(
-                    onClick = {/* TODO */},
-                    contentPadding = PaddingValues(top = 4.dp)
-                ) {
-                    LyftImage()
+                if (displayCharacter) {
+                    CharacterHomeScreen(uiState, viewModel, padding)
+                } else {
+                    NoCharacterHomeScreen(uiState, viewModel, padding)
                 }
             }
-
-
-            // start button
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .offset(y = (-10).dp)
-            ){
-                GenericButton(
-                    onClick = { if (uiState.isRecording) viewModel.onStopClicked() else viewModel.onStartClicked() },
-                    buttonColor = LightBlue,
-                    roundedCornerSize = 10
-                ) {
-                    Text(
-                        text = if (uiState.isRecording) "STOP" else "START",
-                        color = LightPink,
-                        fontSize = 30.sp,
-                    )
-                }
-            }
-
-            // stopwatch
-            if(uiState.isRecording) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .offset(y = (-50).dp)
-                ) {
-                    Text (
-                        text = formatElapsed(uiState.elapsedMillis),
-                        color = LightPink,
-                        fontSize = 24.sp,
-                    )
-                }
-            }
-
         }
     }
 
@@ -162,21 +140,187 @@ fun HomeScreen(
 }
 
 @Composable
-fun UberImage(){
-    Image(
-        painter = painterResource(id = R.drawable.uber_logo),
-        contentDescription = "Uber logo",
-        modifier = Modifier.size(width = 120.dp, height = 20.dp)
-    )
+fun CharacterHomeScreen(
+    uiState: HomeUiState,
+    viewModel: HomeViewModel,
+    padding: PaddingValues
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+    ) {
+        // background layer
+        Background(stateBackground = uiState.drunkState.image)
+
+        // drunk state sign
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = 30.dp)
+        ) {
+            DrunkStateSign(stateText = uiState.drunkState.label, fontSize = uiState.drunkState.fontSize)
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = 180.dp),
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
+        ){
+            // uber button
+            UberButton()
+
+            // lyft button
+            LyftButton()
+        }
+
+        // start button
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = (-10).dp)
+        ){
+            StartButton(uiState, viewModel)
+        }
+
+        // stopwatch
+        if(uiState.isRecording) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (-50).dp)
+            ) {
+                Text (
+                    text = formatElapsed(uiState.elapsedMillis),
+                    color = LightPink,
+                    fontSize = 24.sp,
+                )
+            }
+        }
+    }
 }
 
 @Composable
-fun LyftImage(){
-    Image(
-        painter = painterResource(id = R.drawable.lyft_logo),
-        contentDescription = "Lyft logo",
-        modifier = Modifier.size(width = 150.dp, height = 30.dp)
-    )
+fun NoCharacterHomeScreen(
+    uiState: HomeUiState,
+    viewModel: HomeViewModel,
+    padding: PaddingValues
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = DarkBlue)
+            .padding(padding)
+    ) {
+        // drunk state sign
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = 30.dp)
+        ) {
+            DrunkStateSign(
+                stateText = "YOU ARE ${uiState.drunkState.label}",
+                fontSize = uiState.drunkState.fontSize
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = 180.dp)
+        ) {
+            Text(
+                text = "Don't drive. Get a ride home with a sober friend or use a rideshare app.",
+                color = LightPink,
+                fontSize = 30.sp,
+            )
+        }
+
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = 380.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ){
+            // uber button
+            UberButton()
+
+            // lyft button
+            LyftButton()
+        }
+
+        // start button
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = (-10).dp)
+        ){
+            StartButton(uiState, viewModel)
+        }
+
+        // stopwatch
+        if(uiState.isRecording) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (-50).dp)
+            ) {
+                Text (
+                    text = formatElapsed(uiState.elapsedMillis),
+                    color = LightPink,
+                    fontSize = 24.sp,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun UberButton() {
+    GenericButton(
+        onClick = {/* TODO */},
+        contentPadding = PaddingValues(top = 8.dp)
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.uber_logo),
+            contentDescription = "Uber logo",
+            modifier = Modifier.size(width = 120.dp, height = 20.dp)
+        )
+    }
+}
+
+@Composable
+fun LyftButton() {
+    GenericButton(
+        onClick = {/* TODO */},
+        contentPadding = PaddingValues(top = 4.dp)
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.lyft_logo),
+            contentDescription = "Lyft logo",
+            modifier = Modifier.size(width = 150.dp, height = 30.dp)
+        )
+    }
+}
+
+@Composable
+fun StartButton(
+    uiState: HomeUiState,
+    viewModel: HomeViewModel
+) {
+    GenericButton(
+        onClick = { if (uiState.isRecording) viewModel.onStopClicked() else viewModel.onStartClicked() },
+        buttonColor = LightBlue,
+        roundedCornerSize = 10
+    ) {
+        Text(
+            text = if (uiState.isRecording) "STOP" else "START",
+            color = LightPink,
+            fontSize = 30.sp,
+        )
+    }
 }
 
 @Composable
