@@ -42,8 +42,10 @@ import wpics.alcogait.ui.theme.LightPink
 
 @Composable
 fun MenuBar(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    displayChecked: Boolean,
+    onDisplayCheckedChange: (Boolean) -> Unit,
+    musicChecked: Boolean,
+    onMusicCheckedChange: (Boolean) -> Unit
 ){
     Column(
         modifier = Modifier
@@ -77,7 +79,18 @@ fun MenuBar(
         NavigateItem("Rideshare", R.drawable.rideshare_icon)
 
         // toggle display character
-        DisplayCharacterToggle(checked, onCheckedChange)
+        Toggle(
+            displayChecked,
+            onDisplayCheckedChange,
+            text = "Display Character"
+        )
+
+        // toggle music
+        Toggle(
+            musicChecked,
+            onMusicCheckedChange,
+            text = "Music"
+        )
 
         // alcogait logo(?)
         AlcoGaitLogo()
@@ -149,9 +162,10 @@ fun ProfileHeader() {
 }
 
 @Composable
-fun DisplayCharacterToggle(
+fun Toggle(
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    text: String
 ) {
     Row(
         modifier = Modifier,
@@ -164,7 +178,7 @@ fun DisplayCharacterToggle(
         )
 
         Text(
-            text = if (checked) "Display Character: On" else "Display Character: Off",
+            text = if (checked) "$text: On" else "$text: Off",
             color = LightPink,
             fontSize = 22.sp
         )

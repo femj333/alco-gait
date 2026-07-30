@@ -69,6 +69,8 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     var menuBarVisible by remember { mutableStateOf(false) }
     var displayCharacter by remember { mutableStateOf(true) }
+    /* TODO -> add music */
+    var playMusic by remember { mutableStateOf(true) }
     val density = LocalDensity.current
 
     val menuWidth = 340.dp
@@ -88,8 +90,10 @@ fun HomeScreen(
                 .width(menuWidth)
         ) {
             MenuBar(
-                checked = displayCharacter,
-                onCheckedChange = { displayCharacter = it }
+                displayChecked = displayCharacter,
+                onDisplayCheckedChange = { displayCharacter = it },
+                musicChecked = playMusic,
+                onMusicCheckedChange = { playMusic = it }
             )
         }
 
