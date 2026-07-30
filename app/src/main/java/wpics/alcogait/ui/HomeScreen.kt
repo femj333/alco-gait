@@ -50,9 +50,11 @@ import wpics.alcogait.ui.components.MenuBar
 import java.util.Locale
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
 import wpics.alcogait.viewmodels.HomeUiState
 
 fun formatElapsed(millis: Long): String {
@@ -225,15 +227,31 @@ fun NoCharacterHomeScreen(
             )
         }
 
+        // drink icons
         Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = 180.dp)
+                .offset(y = 150.dp)
+        ) {
+            Image(
+                painter = painterResource(id = uiState.drunkState.noCharacterDrink),
+                contentDescription = "Drink icon",
+                modifier = Modifier.size(width = 230.dp, height = 150.dp)
+            )
+        }
+
+        // warning text
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = 280.dp)
+                .fillMaxWidth(0.75f)
         ) {
             Text(
-                text = "Don't drive. Get a ride home with a sober friend or use a rideshare app.",
+                text = uiState.drunkState.noCharacterText,
                 color = LightPink,
-                fontSize = 30.sp,
+                fontSize = 25.sp,
+                textAlign = TextAlign.Center
             )
         }
 
