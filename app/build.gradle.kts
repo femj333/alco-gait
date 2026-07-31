@@ -50,6 +50,7 @@ dependencies {
     implementation("com.opencsv:opencsv:4.0")
     implementation(libs.androidx.compose.foundation.layout)
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation(libs.androidx.compose.ui.text)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

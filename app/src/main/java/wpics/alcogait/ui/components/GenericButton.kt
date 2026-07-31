@@ -29,11 +29,13 @@ fun GenericButton(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     buttonColor: Color = LightGray,
     roundedCornerSize: Int = 50,
+    width: Int,
+    height: Int,
     content: @Composable () -> Unit
 ) {
     Box(
         modifier = Modifier
-            .size(width = 170.dp, height = 40.dp)
+            .size(width = width.dp, height = height.dp)
             .clickable( onClick = onClick)
             .dropShadow(
                 shape = RoundedCornerShape(roundedCornerSize.dp),

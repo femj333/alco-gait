@@ -50,9 +50,15 @@ import wpics.alcogait.ui.components.MenuBar
 import java.util.Locale
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.em
 import wpics.alcogait.viewmodels.HomeUiState
 
 fun formatElapsed(millis: Long): String {
@@ -159,7 +165,10 @@ fun CharacterHomeScreen(
                 .align(Alignment.TopCenter)
                 .offset(y = 30.dp)
         ) {
-            DrunkStateSign(stateText = uiState.drunkState.label, fontSize = uiState.drunkState.fontSize)
+            CharacterDrunkStateSign(
+                stateText = uiState.drunkState.label,
+                fontSize = uiState.drunkState.fontSize
+            )
         }
 
         Row(
@@ -169,10 +178,20 @@ fun CharacterHomeScreen(
             horizontalArrangement = Arrangement.spacedBy(20.dp)
         ){
             // uber button
-            UberButton()
+            UberButton(
+                buttonWidth = 170,
+                buttonHeight = 40,
+                logoWidth = 120,
+                logoHeight = 20
+            )
 
             // lyft button
-            LyftButton()
+            LyftButton(
+                buttonWidth = 170,
+                buttonHeight = 40,
+                logoWidth = 150,
+                logoHeight = 30
+            )
         }
 
         // start button
@@ -219,21 +238,37 @@ fun NoCharacterHomeScreen(
                 .align(Alignment.TopCenter)
                 .offset(y = 30.dp)
         ) {
-            DrunkStateSign(
+            NoCharacterDrunkStateSign(
                 stateText = "YOU ARE ${uiState.drunkState.label}",
-                fontSize = uiState.drunkState.fontSize
+                fontSize = 45
             )
         }
 
+        // drink icons
         Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = 180.dp)
+                .offset(y = 160.dp)
+        ) {
+            Image(
+                painter = painterResource(id = uiState.drunkState.noCharacterDrink),
+                contentDescription = "Drink icon",
+                modifier = Modifier.size(width = 230.dp, height = 150.dp)
+            )
+        }
+
+        // warning text
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = 330.dp)
+                .fillMaxWidth(0.75f)
         ) {
             Text(
-                text = "Don't drive. Get a ride home with a sober friend or use a rideshare app.",
+                text = uiState.drunkState.noCharacterText,
                 color = LightPink,
-                fontSize = 30.sp,
+                fontSize = 25.sp,
+                textAlign = TextAlign.Center
             )
         }
 
@@ -241,21 +276,33 @@ fun NoCharacterHomeScreen(
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = 380.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+                .offset(y = 460.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ){
             // uber button
-            UberButton()
+            UberButton(
+                buttonWidth = 220,
+                buttonHeight = 60,
+                logoWidth = 130,
+                logoHeight = 35,
+                roundedCornerSize = 20,
+            )
 
             // lyft button
-            LyftButton()
+            LyftButton(
+                buttonWidth = 220,
+                buttonHeight = 60,
+                logoWidth = 150,
+                logoHeight = 47,
+                roundedCornerSize = 20
+            )
         }
 
         // start button
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .offset(y = (-10).dp)
+                .offset(y = (-20).dp)
         ){
             StartButton(uiState, viewModel)
         }
@@ -265,7 +312,7 @@ fun NoCharacterHomeScreen(
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .offset(y = (-50).dp)
+                    .offset(y = (-65).dp)
             ) {
                 Text (
                     text = formatElapsed(uiState.elapsedMillis),
@@ -278,29 +325,47 @@ fun NoCharacterHomeScreen(
 }
 
 @Composable
-fun UberButton() {
+fun UberButton(
+    buttonWidth: Int,
+    buttonHeight: Int,
+    logoWidth: Int,
+    logoHeight: Int,
+    roundedCornerSize: Int = 50
+) {
     GenericButton(
         onClick = {/* TODO */},
-        contentPadding = PaddingValues(top = 8.dp)
+        contentPadding = PaddingValues(top = 8.dp),
+        roundedCornerSize = roundedCornerSize,
+        width = buttonWidth,
+        height = buttonHeight
     ) {
         Image(
             painter = painterResource(id = R.drawable.uber_logo),
             contentDescription = "Uber logo",
-            modifier = Modifier.size(width = 120.dp, height = 20.dp)
+            modifier = Modifier.size(width = logoWidth.dp, height = logoHeight.dp)
         )
     }
 }
 
 @Composable
-fun LyftButton() {
+fun LyftButton(
+    buttonWidth: Int,
+    buttonHeight: Int,
+    logoWidth: Int,
+    logoHeight: Int,
+    roundedCornerSize: Int = 50
+) {
     GenericButton(
         onClick = {/* TODO */},
-        contentPadding = PaddingValues(top = 4.dp)
+        contentPadding = PaddingValues(top = 4.dp),
+        roundedCornerSize = roundedCornerSize,
+        width = buttonWidth,
+        height = buttonHeight
     ) {
         Image(
             painter = painterResource(id = R.drawable.lyft_logo),
             contentDescription = "Lyft logo",
-            modifier = Modifier.size(width = 150.dp, height = 30.dp)
+            modifier = Modifier.size(width = logoWidth.dp, height = logoHeight.dp)
         )
     }
 }
@@ -313,7 +378,9 @@ fun StartButton(
     GenericButton(
         onClick = { if (uiState.isRecording) viewModel.onStopClicked() else viewModel.onStartClicked() },
         buttonColor = LightBlue,
-        roundedCornerSize = 10
+        roundedCornerSize = 10,
+        width = 170,
+        height = 40
     ) {
         Text(
             text = if (uiState.isRecording) "STOP" else "START",
@@ -324,11 +391,10 @@ fun StartButton(
 }
 
 @Composable
-fun DrunkStateSign(
+fun CharacterDrunkStateSign(
     stateText: String,
     fontSize: Int
 ){
-
     Box(
     ) {
         // background to block out gif sign
@@ -368,8 +434,8 @@ fun DrunkStateSign(
 
             Column(
                 modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .offset(x = 260.dp),
+                    .align(Alignment.CenterEnd)
+                    .offset(x = (-8).dp),
                 verticalArrangement = Arrangement.spacedBy(9.5.dp),
 
                 ){
@@ -408,6 +474,84 @@ fun DrunkStateSign(
                 fontSize = fontSize.sp,
                 modifier = Modifier
                     .align(Alignment.Center)
+            )
+        }
+    }
+}
+
+@Composable
+fun NoCharacterDrunkStateSign(
+    stateText: String,
+    fontSize: Int
+) {
+    Box(
+        modifier = Modifier
+            .size(width = 350.dp, height = 140.dp)
+            .dropShadow(
+                shape = RoundedCornerShape(10.dp),
+                shadow = Shadow(
+                    radius = 1.dp,
+                    spread = 2.dp,
+                    color = Color(0x40000000),
+                    offset = DpOffset(x = (-2).dp, 8.dp)
+                )
+            )
+            .clip(RoundedCornerShape(10.dp))
+            .background(color = LightBlue)
+    ) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .offset(x = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+
+            ){
+            repeat(7) { Circle() }
+        }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .offset(x = (-8).dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+
+            ){
+            repeat(7) { Circle() }
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = 11.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+
+            ){
+            repeat(15) { Circle() }
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = (-11).dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+
+            ){
+            repeat(15) { Circle() }
+        }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+        ) {
+            Text(
+                text = stateText,
+                color = LightPink,
+                textAlign = TextAlign.Center,
+                fontSize = fontSize.sp,
+                modifier = Modifier.width(250.dp),
+                style = LocalTextStyle.current.merge(
+                    TextStyle(lineHeight = 1.em)
+                )
             )
         }
     }
