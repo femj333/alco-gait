@@ -51,10 +51,14 @@ import java.util.Locale
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.em
 import wpics.alcogait.viewmodels.HomeUiState
 
 fun formatElapsed(millis: Long): String {
@@ -161,7 +165,10 @@ fun CharacterHomeScreen(
                 .align(Alignment.TopCenter)
                 .offset(y = 30.dp)
         ) {
-            DrunkStateSign(stateText = uiState.drunkState.label, fontSize = uiState.drunkState.fontSize)
+            CharacterDrunkStateSign(
+                stateText = uiState.drunkState.label,
+                fontSize = uiState.drunkState.fontSize
+            )
         }
 
         Row(
@@ -221,9 +228,9 @@ fun NoCharacterHomeScreen(
                 .align(Alignment.TopCenter)
                 .offset(y = 30.dp)
         ) {
-            DrunkStateSign(
+            NoCharacterDrunkStateSign(
                 stateText = "YOU ARE ${uiState.drunkState.label}",
-                fontSize = uiState.drunkState.fontSize
+                fontSize = 45
             )
         }
 
@@ -342,11 +349,10 @@ fun StartButton(
 }
 
 @Composable
-fun DrunkStateSign(
+fun CharacterDrunkStateSign(
     stateText: String,
     fontSize: Int
 ){
-
     Box(
     ) {
         // background to block out gif sign
@@ -386,8 +392,8 @@ fun DrunkStateSign(
 
             Column(
                 modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .offset(x = 260.dp),
+                    .align(Alignment.CenterEnd)
+                    .offset(x = (-8).dp),
                 verticalArrangement = Arrangement.spacedBy(9.5.dp),
 
                 ){
@@ -426,6 +432,84 @@ fun DrunkStateSign(
                 fontSize = fontSize.sp,
                 modifier = Modifier
                     .align(Alignment.Center)
+            )
+        }
+    }
+}
+
+@Composable
+fun NoCharacterDrunkStateSign(
+    stateText: String,
+    fontSize: Int
+) {
+    Box(
+        modifier = Modifier
+            .size(width = 350.dp, height = 140.dp)
+            .dropShadow(
+                shape = RoundedCornerShape(10.dp),
+                shadow = Shadow(
+                    radius = 1.dp,
+                    spread = 2.dp,
+                    color = Color(0x40000000),
+                    offset = DpOffset(x = (-2).dp, 8.dp)
+                )
+            )
+            .clip(RoundedCornerShape(10.dp))
+            .background(color = LightBlue)
+    ) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .offset(x = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+
+            ){
+            repeat(7) { Circle() }
+        }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .offset(x = (-8).dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+
+            ){
+            repeat(7) { Circle() }
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = 11.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+
+            ){
+            repeat(15) { Circle() }
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = (-11).dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+
+            ){
+            repeat(15) { Circle() }
+        }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+        ) {
+            Text(
+                text = stateText,
+                color = LightPink,
+                textAlign = TextAlign.Center,
+                fontSize = fontSize.sp,
+                modifier = Modifier.width(250.dp),
+                style = LocalTextStyle.current.merge(
+                    TextStyle(lineHeight = 1.em)
+                )
             )
         }
     }
