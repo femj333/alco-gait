@@ -178,10 +178,20 @@ fun CharacterHomeScreen(
             horizontalArrangement = Arrangement.spacedBy(20.dp)
         ){
             // uber button
-            UberButton()
+            UberButton(
+                buttonWidth = 170,
+                buttonHeight = 40,
+                logoWidth = 120,
+                logoHeight = 20
+            )
 
             // lyft button
-            LyftButton()
+            LyftButton(
+                buttonWidth = 170,
+                buttonHeight = 40,
+                logoWidth = 150,
+                logoHeight = 30
+            )
         }
 
         // start button
@@ -238,7 +248,7 @@ fun NoCharacterHomeScreen(
         Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = 150.dp)
+                .offset(y = 160.dp)
         ) {
             Image(
                 painter = painterResource(id = uiState.drunkState.noCharacterDrink),
@@ -251,7 +261,7 @@ fun NoCharacterHomeScreen(
         Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = 280.dp)
+                .offset(y = 330.dp)
                 .fillMaxWidth(0.75f)
         ) {
             Text(
@@ -266,21 +276,33 @@ fun NoCharacterHomeScreen(
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = 380.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+                .offset(y = 460.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ){
             // uber button
-            UberButton()
+            UberButton(
+                buttonWidth = 220,
+                buttonHeight = 60,
+                logoWidth = 130,
+                logoHeight = 35,
+                roundedCornerSize = 20,
+            )
 
             // lyft button
-            LyftButton()
+            LyftButton(
+                buttonWidth = 220,
+                buttonHeight = 60,
+                logoWidth = 150,
+                logoHeight = 47,
+                roundedCornerSize = 20
+            )
         }
 
         // start button
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .offset(y = (-10).dp)
+                .offset(y = (-20).dp)
         ){
             StartButton(uiState, viewModel)
         }
@@ -290,7 +312,7 @@ fun NoCharacterHomeScreen(
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .offset(y = (-50).dp)
+                    .offset(y = (-65).dp)
             ) {
                 Text (
                     text = formatElapsed(uiState.elapsedMillis),
@@ -303,29 +325,47 @@ fun NoCharacterHomeScreen(
 }
 
 @Composable
-fun UberButton() {
+fun UberButton(
+    buttonWidth: Int,
+    buttonHeight: Int,
+    logoWidth: Int,
+    logoHeight: Int,
+    roundedCornerSize: Int = 50
+) {
     GenericButton(
         onClick = {/* TODO */},
-        contentPadding = PaddingValues(top = 8.dp)
+        contentPadding = PaddingValues(top = 8.dp),
+        roundedCornerSize = roundedCornerSize,
+        width = buttonWidth,
+        height = buttonHeight
     ) {
         Image(
             painter = painterResource(id = R.drawable.uber_logo),
             contentDescription = "Uber logo",
-            modifier = Modifier.size(width = 120.dp, height = 20.dp)
+            modifier = Modifier.size(width = logoWidth.dp, height = logoHeight.dp)
         )
     }
 }
 
 @Composable
-fun LyftButton() {
+fun LyftButton(
+    buttonWidth: Int,
+    buttonHeight: Int,
+    logoWidth: Int,
+    logoHeight: Int,
+    roundedCornerSize: Int = 50
+) {
     GenericButton(
         onClick = {/* TODO */},
-        contentPadding = PaddingValues(top = 4.dp)
+        contentPadding = PaddingValues(top = 4.dp),
+        roundedCornerSize = roundedCornerSize,
+        width = buttonWidth,
+        height = buttonHeight
     ) {
         Image(
             painter = painterResource(id = R.drawable.lyft_logo),
             contentDescription = "Lyft logo",
-            modifier = Modifier.size(width = 150.dp, height = 30.dp)
+            modifier = Modifier.size(width = logoWidth.dp, height = logoHeight.dp)
         )
     }
 }
@@ -338,7 +378,9 @@ fun StartButton(
     GenericButton(
         onClick = { if (uiState.isRecording) viewModel.onStopClicked() else viewModel.onStartClicked() },
         buttonColor = LightBlue,
-        roundedCornerSize = 10
+        roundedCornerSize = 10,
+        width = 170,
+        height = 40
     ) {
         Text(
             text = if (uiState.isRecording) "STOP" else "START",
