@@ -77,6 +77,7 @@ fun HomeScreen(
     padding: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
     if (displayCharacter) {
         CharacterHomeScreen(uiState, viewModel, padding)
     } else {

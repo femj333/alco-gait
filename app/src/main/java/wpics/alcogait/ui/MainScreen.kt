@@ -25,6 +25,8 @@ import wpics.alcogait.ui.components.TopBar
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
     var menuBarVisible by remember { mutableStateOf(false) }
     var displayCharacter by remember { mutableStateOf(true) }
@@ -69,10 +71,17 @@ fun MainScreen() {
                     .fillMaxSize()
                     .statusBarsPadding(),
                 topBar = {
-                    TopBar(
-                        onMenuClick = { menuBarVisible = !menuBarVisible },
-                        isLocationScreen = true
-                    )
+                    if (currentRoute == "Location") { /* might have to change to use Routes, check after back on wifi */
+                        TopBar(
+                            onMenuClick = { menuBarVisible = !menuBarVisible },
+                            isLocationScreen = true
+                        )
+                    } else {
+                        TopBar(
+                            onMenuClick = { menuBarVisible = !menuBarVisible },
+                            isLocationScreen = false
+                        )
+                    }
                 }
             ) { padding ->
                 NavHost(navController = navController, startDestination = Routes.Home.route) {
