@@ -71,7 +71,7 @@ fun MainScreen() {
                     .fillMaxSize()
                     .statusBarsPadding(),
                 topBar = {
-                    if (currentRoute == "Location") { /* might have to change to use Routes, check after back on wifi */
+                    if (currentRoute == "Location") { /* TODO -> might have to change to use Routes, check after back on wifi */
                         TopBar(
                             onMenuClick = { menuBarVisible = !menuBarVisible },
                             isLocationScreen = true

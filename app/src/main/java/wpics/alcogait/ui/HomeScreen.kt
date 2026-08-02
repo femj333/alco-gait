@@ -1,5 +1,6 @@
 package wpics.alcogait.ui
 
+import android.hardware.lights.Light
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -60,6 +61,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.em
+import wpics.alcogait.ui.components.Circle
 import wpics.alcogait.ui.theme.AlcoGaitTheme
 import wpics.alcogait.viewmodels.HomeUiState
 
@@ -461,7 +463,9 @@ fun NoCharacterDrunkStateSign(
             verticalArrangement = Arrangement.spacedBy(12.dp),
 
             ){
-            repeat(7) { Circle() }
+            repeat(7) {
+                Circle()
+            }
         }
 
         Column(
@@ -471,7 +475,9 @@ fun NoCharacterDrunkStateSign(
             verticalArrangement = Arrangement.spacedBy(12.dp),
 
             ){
-            repeat(7) { Circle() }
+            repeat(7) {
+                Circle()
+            }
         }
 
         Row(
@@ -481,7 +487,9 @@ fun NoCharacterDrunkStateSign(
             horizontalArrangement = Arrangement.spacedBy(14.dp),
 
             ){
-            repeat(15) { Circle() }
+            repeat(15) {
+                Circle()
+            }
         }
 
         Row(
@@ -491,7 +499,9 @@ fun NoCharacterDrunkStateSign(
             horizontalArrangement = Arrangement.spacedBy(14.dp),
 
             ){
-            repeat(15) { Circle() }
+            repeat(15) {
+                Circle()
+            }
         }
 
         Box(
@@ -513,17 +523,15 @@ fun NoCharacterDrunkStateSign(
 
 }
 
-
 @Composable
 fun Circle() {
     Box(
         modifier = Modifier
             .size(6.dp)
             .clip(CircleShape)
-            .background(LightPink)
+            .background(color = LightPink)
     )
 }
-
 
 @Composable
 fun Background(stateBackground: Int) {
