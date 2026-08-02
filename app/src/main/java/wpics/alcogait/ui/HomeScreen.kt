@@ -1,5 +1,6 @@
 package wpics.alcogait.ui
 
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -59,6 +60,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.em
+import wpics.alcogait.ui.theme.AlcoGaitTheme
 import wpics.alcogait.viewmodels.HomeUiState
 
 fun formatElapsed(millis: Long): String {
@@ -70,7 +72,8 @@ fun formatElapsed(millis: Long): String {
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = viewModel(),
+    navController: rememberNavController
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var menuBarVisible by remember { mutableStateOf(false) }
@@ -99,7 +102,8 @@ fun HomeScreen(
                 displayChecked = displayCharacter,
                 onDisplayCheckedChange = { displayCharacter = it },
                 musicChecked = playMusic,
-                onMusicCheckedChange = { playMusic = it }
+                onMusicCheckedChange = { playMusic = it },
+                navController = navController
             )
         }
 
@@ -116,7 +120,10 @@ fun HomeScreen(
                     .fillMaxSize()
                     .statusBarsPadding(),
                 topBar = {
-                    TopBar(onMenuClick = { menuBarVisible = !menuBarVisible })
+                    TopBar(
+                        onMenuClick = { menuBarVisible = !menuBarVisible },
+                        isLocationScreen = false
+                    )
                 }
             ) { padding ->
 

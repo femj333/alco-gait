@@ -30,26 +30,43 @@ import wpics.alcogait.ui.theme.LightBlue
 import wpics.alcogait.ui.theme.LightPink
 
 @Composable
-fun TopBar(onMenuClick: () -> Unit) {
+fun TopBar(
+    onMenuClick: () -> Unit,
+    isLocationScreen: Boolean
+) {
     Box(
         modifier = Modifier
             .background(color = DarkBlue)
             .fillMaxWidth()
     ) {
-        Button(
-            onClick = { onMenuClick() },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = DarkBlue
-            ),
-            modifier = Modifier
-        ) {
-            MenuButton()
+        if (isLocationScreen) {
+            Button(
+                onClick = { onMenuClick() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = DarkBlue
+                ),
+                modifier = Modifier
+            ) {
+                MenuButton(barColors = LightPink)
+            }
+        } else {
+            Button(
+                onClick = { onMenuClick() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = DarkBlue
+                ),
+                modifier = Modifier
+            ) {
+                MenuButton(barColors = LightPink)
+            }
         }
     }
 }
 
 @Composable
-fun MenuButton() {
+fun MenuButton(
+    barColors: Color
+) {
     Column(
         modifier = Modifier
             .background(color = DarkBlue)
@@ -59,7 +76,7 @@ fun MenuButton() {
         repeat(3) {
             HorizontalDivider(
                 thickness = 2.dp,
-                color = LightPink
+                color = barColors
             )
         }
     }
