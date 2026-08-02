@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.getDrawable
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import wpics.alcogait.R
-import wpics.alcogait.ui.components.GenericButton
 import wpics.alcogait.ui.components.TopBar
 import wpics.alcogait.ui.theme.DarkBlue
 import wpics.alcogait.ui.theme.LightBlue
@@ -61,7 +60,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.em
-import wpics.alcogait.ui.components.Circle
+import wpics.alcogait.ui.components.ButtonOne
 import wpics.alcogait.ui.theme.AlcoGaitTheme
 import wpics.alcogait.viewmodels.HomeUiState
 
@@ -289,7 +288,7 @@ fun UberButton(
     logoHeight: Int,
     roundedCornerSize: Int = 50
 ) {
-    GenericButton(
+    ButtonOne(
         onClick = {/* TODO */},
         contentPadding = PaddingValues(top = 8.dp),
         roundedCornerSize = roundedCornerSize,
@@ -312,7 +311,7 @@ fun LyftButton(
     logoHeight: Int,
     roundedCornerSize: Int = 50
 ) {
-    GenericButton(
+    ButtonOne(
         onClick = {/* TODO */},
         contentPadding = PaddingValues(top = 4.dp),
         roundedCornerSize = roundedCornerSize,
@@ -332,7 +331,7 @@ fun StartButton(
     uiState: HomeUiState,
     viewModel: HomeViewModel
 ) {
-    GenericButton(
+    ButtonOne(
         onClick = { if (uiState.isRecording) viewModel.onStopClicked() else viewModel.onStartClicked() },
         buttonColor = LightBlue,
         roundedCornerSize = 10,

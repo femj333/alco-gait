@@ -53,18 +53,12 @@ fun TopBar(
             .fillMaxWidth()
     ) {
         if (isLocationScreen) {
-            MenuButton(
-                onMenuClick = onMenuClick,
-                barColors = LightPink
-            )
-        } else {
             Row(
                 modifier = Modifier
                     .fillMaxSize(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                /* TODO -> needs white background and both drop shadows search bar has */
-                MenuButton(
+                MenuButtonIcon(
                     onMenuClick = onMenuClick,
                     barColors = DarkBlue
                 )
@@ -73,6 +67,11 @@ fun TopBar(
 
                 HelpButton()
             }
+        } else {
+            MenuButton(
+                onMenuClick = onMenuClick,
+                barColors = LightPink
+            )
         }
     }
 }
@@ -88,6 +87,19 @@ fun MenuButton(
             containerColor = DarkBlue
         ),
         modifier = Modifier
+    ) {
+        MenuBars(barColors = barColors)
+    }
+}
+
+@Composable
+fun MenuButtonIcon(
+    onMenuClick: () -> Unit,
+    barColors: Color
+) {
+    ButtonTwo(
+        onClick = { onMenuClick() },
+        size = 20
     ) {
         MenuBars(barColors = barColors)
     }
@@ -154,29 +166,9 @@ fun SearchBar() {
 
 @Composable
 fun HelpButton() {
-    Button(
+    ButtonTwo(
         onClick = { /* TODO */ },
-        modifier = Modifier
-            .dropShadow(
-                shape = RoundedCornerShape(20.dp),
-                shadow = Shadow(
-                    radius = 4.dp,
-                    spread = 0.dp,
-                    color = Color.Black.copy(alpha = 0.4f),
-                    offset = DpOffset(x = 0.dp, y = 2.dp)
-                )
-            )
-            .dropShadow(
-                shape = RoundedCornerShape(20.dp),
-                shadow = Shadow(
-                    radius = 13.dp,
-                    spread = (-3).dp,
-                    color = Color.Black.copy(alpha = 0.3f),
-                    offset = DpOffset(x = 0.dp, y = 7.dp)
-                )
-            )
-            .clip(CircleShape)
-            .background(Color.White)
+        size = 20
     ) {
         Icon(
             painter = painterResource(id = R.drawable.question_mark_icon),

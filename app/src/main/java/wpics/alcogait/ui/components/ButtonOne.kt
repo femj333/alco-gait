@@ -1,6 +1,5 @@
 package wpics.alcogait.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -16,15 +15,12 @@ import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.draw.innerShadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import wpics.alcogait.R
 import wpics.alcogait.ui.theme.LightGray
-import kotlin.math.round
 
 @Composable
-fun GenericButton(
+fun ButtonOne(
     onClick: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     buttonColor: Color = LightGray,
