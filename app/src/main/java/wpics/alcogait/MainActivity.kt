@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import wpics.alcogait.ui.theme.AlcoGaitTheme
 import wpics.alcogait.ui.HomeScreen
+import wpics.alcogait.ui.MainScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +21,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AlcoGaitTheme {
-                HomeScreen()
+                MainScreen()
             }
         }
     }

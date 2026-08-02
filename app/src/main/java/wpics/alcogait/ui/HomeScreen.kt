@@ -73,67 +73,14 @@ fun formatElapsed(millis: Long): String {
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = viewModel(),
-    navController: rememberNavController
+    displayCharacter: Boolean,
+    padding: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var menuBarVisible by remember { mutableStateOf(false) }
-    var displayCharacter by remember { mutableStateOf(true) }
-    /* TODO -> add music */
-    var playMusic by remember { mutableStateOf(true) }
-    val density = LocalDensity.current
-
-    val menuWidth = 340.dp
-    val contentOffsetX by animateDpAsState(
-        targetValue = if (menuBarVisible) menuWidth else 0.dp,
-        label = "contentOffset"
-    )
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // menu bar pullout
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .fillMaxHeight()
-                .width(menuWidth)
-        ) {
-            MenuBar(
-                displayChecked = displayCharacter,
-                onDisplayCheckedChange = { displayCharacter = it },
-                musicChecked = playMusic,
-                onMusicCheckedChange = { playMusic = it },
-                navController = navController
-            )
-        }
-
-        // main home screen, pushes over when menu bar is open
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer(
-                    translationX = with(density) { contentOffsetX.toPx() }
-                )
-        ) {
-            Scaffold(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding(),
-                topBar = {
-                    TopBar(
-                        onMenuClick = { menuBarVisible = !menuBarVisible },
-                        isLocationScreen = false
-                    )
-                }
-            ) { padding ->
-
-                if (displayCharacter) {
-                    CharacterHomeScreen(uiState, viewModel, padding)
-                } else {
-                    NoCharacterHomeScreen(uiState, viewModel, padding)
-                }
-            }
-        }
+    if (displayCharacter) {
+        CharacterHomeScreen(uiState, viewModel, padding)
+    } else {
+        NoCharacterHomeScreen(uiState, viewModel, padding)
     }
 
     // alert when recording is too short

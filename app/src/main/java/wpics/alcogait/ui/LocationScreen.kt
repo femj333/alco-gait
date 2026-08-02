@@ -2,6 +2,7 @@ package wpics.alcogait.ui
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,65 +27,13 @@ import wpics.alcogait.ui.components.TopBar
 
 @Composable
 fun LocationScreen(
-    navController: rememberNavController
+    padding: PaddingValues
 ) {
-    var menuBarVisible by remember { mutableStateOf(false) }
-    var displayCharacter by remember { mutableStateOf(true) }
-    var playMusic by remember { mutableStateOf(true) }
-    val density = LocalDensity.current
-    val menuWidth = 340.dp
-    val contentOffsetX by animateDpAsState(
-        targetValue = if (menuBarVisible) menuWidth else 0.dp,
-        label = "contentOffset"
-    )
-
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
     ) {
-        // menu bar pullout
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .fillMaxHeight()
-                .width(menuWidth)
-        ) {
-            MenuBar(
-                displayChecked = displayCharacter,
-                onDisplayCheckedChange = { displayCharacter = it },
-                musicChecked = playMusic,
-                onMusicCheckedChange = { playMusic = it },
-                navController = navController
-            )
-        }
 
-        // main home screen, pushes over when menu bar is open
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer(
-                    translationX = with(density) { contentOffsetX.toPx() }
-                )
-        ) {
-            Scaffold(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding(),
-                topBar = {
-                    TopBar(
-                        onMenuClick = { menuBarVisible = !menuBarVisible },
-                        isLocationScreen = true
-                    )
-                }
-            ) { padding ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                ) {
-
-                }
-
-            }
-        }
     }
 }
