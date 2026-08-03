@@ -6,10 +6,10 @@ import androidx.room3.Query
 
 @Dao
 interface DrinksDao {
-    @Query("SELECT * FROM drinks WHERE userId = :userId")
+    @Query("SELECT * FROM drinks WHERE user_id = :userId")
     suspend fun getDrinksByUserId(userId: Int): List<Drinks>
 
-    @Query("SELECT * FROM drinks WHERE userId = :userId AND timestamp = :timestamp")
+    @Query("SELECT * FROM drinks WHERE user_id = :userId AND timestamp = :timestamp")
     suspend fun getDrinksByUserIdAndTimestamp(userId: Int, timestamp: String): Drinks?
 
     @Insert

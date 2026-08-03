@@ -4,7 +4,7 @@ import androidx.room3.ColumnInfo
 import androidx.room3.Entity
 import androidx.room3.PrimaryKey
 
-@Entity(tableName = "drinks", primaryKeys = ["userId", "timestamp"])
+@Entity(tableName = "drinks", primaryKeys = ["user_id", "timestamp"])
 data class Drinks(
     @ColumnInfo(name = "user_id") val userId: Int,
     @ColumnInfo(name = "latitude") val latitude: Float,
