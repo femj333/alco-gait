@@ -18,6 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import wpics.alcogait.Routes
 import wpics.alcogait.ui.components.MenuBar
 import wpics.alcogait.ui.components.TopBar
@@ -71,7 +75,7 @@ fun MainScreen() {
                     .fillMaxSize()
                     .statusBarsPadding(),
                 topBar = {
-                    if (currentRoute == "Location") { /* TODO -> might have to change to use Routes, check after back on wifi */
+                    if (currentRoute == "Location") {
                         TopBar(
                             onMenuClick = { menuBarVisible = !menuBarVisible },
                             isLocationScreen = true
@@ -101,7 +105,7 @@ fun MainScreen() {
                         LocationScreen(padding)
                     }
 
-                    composale(Routes.Rideshare.route) {
+                    composable(Routes.Rideshare.route) {
                         RideshareScreen(padding)
                     }
                 }

@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -36,6 +38,7 @@ import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import wpics.alcogait.R
 import wpics.alcogait.Routes
 import wpics.alcogait.ui.theme.DarkBlue
@@ -48,7 +51,7 @@ fun MenuBar(
     onDisplayCheckedChange: (Boolean) -> Unit,
     musicChecked: Boolean,
     onMusicCheckedChange: (Boolean) -> Unit,
-    navController: rememberNavController
+    navController: NavController
 ){
     Column(
         modifier = Modifier
@@ -60,7 +63,9 @@ fun MenuBar(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         // profile header
-        ProfileHeader()
+        ProfileHeader(
+            onClick = { navController.navigate(Routes.Profile.route) }
+        )
 
         HorizontalDivider(
             modifier = Modifier
@@ -123,7 +128,12 @@ fun NavigateItem(
     onClick: () -> Unit
 ) {
     Button(
-        onClick = { onClick() }
+        onClick = { onClick() },
+        contentPadding = PaddingValues(0.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black,
+            contentColor = LightPink
+        )
     ) {
         Row(
             modifier = Modifier,
@@ -147,42 +157,53 @@ fun NavigateItem(
 }
 
 @Composable
-fun ProfileHeader() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(20.dp)
+fun ProfileHeader(
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = { onClick() },
+        contentPadding = PaddingValues(0.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black,
+            contentColor = LightPink
+        )
     ) {
-        // profile icon
-        Box(
-            modifier = Modifier
-                .size(60.dp)
-                .background(color = DarkBlue, shape = CircleShape)
-        ){
-            Icon(
-                painter = painterResource(id = R.drawable.profile_mask),
-                contentDescription = "Profile Icon",
-                tint = LightPink,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(15.dp)
+        ) {
+            // profile icon
+            Box(
                 modifier = Modifier
-                    .size(50.dp)
-                    .align(Alignment.Center)
-            )
-        }
+                    .size(60.dp)
+                    .background(color = DarkBlue, shape = CircleShape)
+            ){
+                Icon(
+                    painter = painterResource(id = R.drawable.profile_mask),
+                    contentDescription = "Profile Icon",
+                    tint = LightPink,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .align(Alignment.Center)
+                )
+            }
 
-        // profile name
-        Column(
-            modifier = Modifier,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ){
-            Text(
-                text = "Fem",
-                color = LightPink,
-                fontSize = 25.sp
-            )
-            Text(
-                text = "View Profile",
-                color = LightPink,
-                fontSize = 18.sp
-            )
+            // profile name
+            Column(
+                modifier = Modifier,
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ){
+                Text(
+                    text = "Fem",
+                    color = LightPink,
+                    fontSize = 25.sp
+                )
+                Text(
+                    text = "View Profile",
+                    color = LightPink,
+                    fontSize = 18.sp
+                )
+            }
         }
     }
 }

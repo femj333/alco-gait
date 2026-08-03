@@ -7,12 +7,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -33,6 +35,7 @@ import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,8 +58,9 @@ fun TopBar(
         if (isLocationScreen) {
             Row(
                 modifier = Modifier
-                    .fillMaxSize(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    .fillMaxWidth()
+                    .padding(start = 10.dp, top = 5.dp, bottom = 5.dp, end = 5.dp),
+                horizontalArrangement = Arrangement.spacedBy(space = 30.dp)
             ) {
                 MenuButtonIcon(
                     onMenuClick = onMenuClick,
@@ -99,7 +103,8 @@ fun MenuButtonIcon(
 ) {
     ButtonTwo(
         onClick = { onMenuClick() },
-        size = 20
+        size = 40,
+        contentPadding = PaddingValues(10.dp)
     ) {
         MenuBars(barColors = barColors)
     }
@@ -111,8 +116,7 @@ fun MenuBars(
 ) {
     Column(
         modifier = Modifier
-            .background(color = DarkBlue)
-            .fillMaxWidth(0.08f),
+            .width(25.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ){
         repeat(3) {
@@ -128,7 +132,7 @@ fun MenuBars(
 fun SearchBar() {
     Row(
         modifier = Modifier
-            .size(width = 200.dp, height = 50.dp)
+            .size(width = 250.dp, height = 40.dp)
             .dropShadow(
                 shape = RoundedCornerShape(20.dp),
                 shadow = Shadow(
@@ -149,17 +153,20 @@ fun SearchBar() {
             )
             .clip(shape = RoundedCornerShape(20.dp))
             .background(color = Color.White)
+            .padding(start = 5.dp),
+        horizontalArrangement = Arrangement.spacedBy(space = 5.dp)
     ) {
         Icon(
             painter = painterResource(id = R.drawable.search_icon),
             contentDescription = "Search Icon",
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(30.dp).align(Alignment.CenterVertically)
         )
 
         Text(
             text = "Find location",
             color = LightGray,
-            fontSize = 25.sp
+            fontSize = 20.sp,
+            modifier = Modifier.align(Alignment.CenterVertically)
         )
     }
 }
@@ -168,12 +175,13 @@ fun SearchBar() {
 fun HelpButton() {
     ButtonTwo(
         onClick = { /* TODO */ },
-        size = 20
+        size = 40,
+        contentAlignment = Alignment.Center
     ) {
         Icon(
             painter = painterResource(id = R.drawable.question_mark_icon),
             contentDescription = "Question Mark Icon",
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(30.dp)
         )
     }
 }

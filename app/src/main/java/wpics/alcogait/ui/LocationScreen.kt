@@ -40,5 +40,6 @@ fun LocationScreen(
             3. access database to display drink icons with number of times drank at a certain location
             4. add pop up to display info about a location
         */
+        Text(text = "Location screen")
     }
 }

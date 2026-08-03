@@ -26,6 +26,7 @@ fun ButtonTwo(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     buttonColor: Color = Color.White,
     size: Int,
+    contentAlignment: Alignment = Alignment.TopCenter,
     content: @Composable () -> Unit
 ) {
     Box(
@@ -53,7 +54,7 @@ fun ButtonTwo(
             .clip(CircleShape)
             .background(color = buttonColor, shape = CircleShape)
             .padding(contentPadding),
-        contentAlignment = Alignment.TopCenter
+        contentAlignment = contentAlignment
     ){
         content()
     }
