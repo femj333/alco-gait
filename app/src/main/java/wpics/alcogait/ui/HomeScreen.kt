@@ -1,5 +1,7 @@
 package wpics.alcogait.ui
 
+import android.hardware.lights.Light
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -39,7 +41,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.getDrawable
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import wpics.alcogait.R
-import wpics.alcogait.ui.components.GenericButton
 import wpics.alcogait.ui.components.TopBar
 import wpics.alcogait.ui.theme.DarkBlue
 import wpics.alcogait.ui.theme.LightBlue
@@ -59,6 +60,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.em
+import wpics.alcogait.ui.components.ButtonOne
+import wpics.alcogait.ui.theme.AlcoGaitTheme
 import wpics.alcogait.viewmodels.HomeUiState
 
 fun formatElapsed(millis: Long): String {
@@ -70,63 +73,16 @@ fun formatElapsed(millis: Long): String {
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = viewModel(),
+    displayCharacter: Boolean,
+    padding: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var menuBarVisible by remember { mutableStateOf(false) }
-    var displayCharacter by remember { mutableStateOf(true) }
-    /* TODO -> add music */
-    var playMusic by remember { mutableStateOf(true) }
-    val density = LocalDensity.current
 
-    val menuWidth = 340.dp
-    val contentOffsetX by animateDpAsState(
-        targetValue = if (menuBarVisible) menuWidth else 0.dp,
-        label = "contentOffset"
-    )
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // menu bar pullout
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .fillMaxHeight()
-                .width(menuWidth)
-        ) {
-            MenuBar(
-                displayChecked = displayCharacter,
-                onDisplayCheckedChange = { displayCharacter = it },
-                musicChecked = playMusic,
-                onMusicCheckedChange = { playMusic = it }
-            )
-        }
-
-        // main home screen, pushes over when menu bar is open
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer(
-                    translationX = with(density) { contentOffsetX.toPx() }
-                )
-        ) {
-            Scaffold(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding(),
-                topBar = {
-                    TopBar(onMenuClick = { menuBarVisible = !menuBarVisible })
-                }
-            ) { padding ->
-
-                if (displayCharacter) {
-                    CharacterHomeScreen(uiState, viewModel, padding)
-                } else {
-                    NoCharacterHomeScreen(uiState, viewModel, padding)
-                }
-            }
-        }
+    if (displayCharacter) {
+        CharacterHomeScreen(uiState, viewModel, padding)
+    } else {
+        NoCharacterHomeScreen(uiState, viewModel, padding)
     }
 
     // alert when recording is too short
@@ -332,7 +288,7 @@ fun UberButton(
     logoHeight: Int,
     roundedCornerSize: Int = 50
 ) {
-    GenericButton(
+    ButtonOne(
         onClick = {/* TODO */},
         contentPadding = PaddingValues(top = 8.dp),
         roundedCornerSize = roundedCornerSize,
@@ -355,7 +311,7 @@ fun LyftButton(
     logoHeight: Int,
     roundedCornerSize: Int = 50
 ) {
-    GenericButton(
+    ButtonOne(
         onClick = {/* TODO */},
         contentPadding = PaddingValues(top = 4.dp),
         roundedCornerSize = roundedCornerSize,
@@ -375,7 +331,7 @@ fun StartButton(
     uiState: HomeUiState,
     viewModel: HomeViewModel
 ) {
-    GenericButton(
+    ButtonOne(
         onClick = { if (uiState.isRecording) viewModel.onStopClicked() else viewModel.onStartClicked() },
         buttonColor = LightBlue,
         roundedCornerSize = 10,
@@ -506,7 +462,9 @@ fun NoCharacterDrunkStateSign(
             verticalArrangement = Arrangement.spacedBy(12.dp),
 
             ){
-            repeat(7) { Circle() }
+            repeat(7) {
+                Circle()
+            }
         }
 
         Column(
@@ -516,7 +474,9 @@ fun NoCharacterDrunkStateSign(
             verticalArrangement = Arrangement.spacedBy(12.dp),
 
             ){
-            repeat(7) { Circle() }
+            repeat(7) {
+                Circle()
+            }
         }
 
         Row(
@@ -526,7 +486,9 @@ fun NoCharacterDrunkStateSign(
             horizontalArrangement = Arrangement.spacedBy(14.dp),
 
             ){
-            repeat(15) { Circle() }
+            repeat(15) {
+                Circle()
+            }
         }
 
         Row(
@@ -536,7 +498,9 @@ fun NoCharacterDrunkStateSign(
             horizontalArrangement = Arrangement.spacedBy(14.dp),
 
             ){
-            repeat(15) { Circle() }
+            repeat(15) {
+                Circle()
+            }
         }
 
         Box(
@@ -558,17 +522,15 @@ fun NoCharacterDrunkStateSign(
 
 }
 
-
 @Composable
 fun Circle() {
     Box(
         modifier = Modifier
             .size(6.dp)
             .clip(CircleShape)
-            .background(LightPink)
+            .background(color = LightPink)
     )
 }
-
 
 @Composable
 fun Background(stateBackground: Int) {

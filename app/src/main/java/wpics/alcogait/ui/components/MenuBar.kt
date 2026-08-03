@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -35,7 +38,9 @@ import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import wpics.alcogait.R
+import wpics.alcogait.Routes
 import wpics.alcogait.ui.theme.DarkBlue
 import wpics.alcogait.ui.theme.LightBlue
 import wpics.alcogait.ui.theme.LightPink
@@ -45,7 +50,8 @@ fun MenuBar(
     displayChecked: Boolean,
     onDisplayCheckedChange: (Boolean) -> Unit,
     musicChecked: Boolean,
-    onMusicCheckedChange: (Boolean) -> Unit
+    onMusicCheckedChange: (Boolean) -> Unit,
+    navController: NavController
 ){
     Column(
         modifier = Modifier
@@ -57,7 +63,9 @@ fun MenuBar(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         // profile header
-        ProfileHeader()
+        ProfileHeader(
+            onClick = { navController.navigate(Routes.Profile.route) }
+        )
 
         HorizontalDivider(
             modifier = Modifier
@@ -67,28 +75,44 @@ fun MenuBar(
         )
 
         // navigate to home screen
-        NavigateItem("Home", R.drawable.home_icon)
+        NavigateItem(
+            destination = "Home",
+            icon = R.drawable.home_icon,
+            onClick = { navController.navigate(Routes.Home.route) }
+        )
 
         // navigate to location screen
-        NavigateItem("Location", R.drawable.location_icon)
+        NavigateItem(
+            destination = "Location",
+            icon = R.drawable.location_icon,
+            onClick = { navController.navigate(Routes.Location.route) }
+        )
 
         // navigate to time screen
-        NavigateItem("Time", R.drawable.time_icon)
+        NavigateItem(
+            destination = "Time",
+            icon = R.drawable.time_icon,
+            onClick = { navController.navigate(Routes.Time.route) }
+        )
 
         // navigate to rideshare screen
-        NavigateItem("Rideshare", R.drawable.rideshare_icon)
+        NavigateItem(
+            destination = "Rideshare",
+            icon = R.drawable.rideshare_icon,
+            onClick = { navController.navigate(Routes.Rideshare.route) }
+        )
 
         // toggle display character
         Toggle(
-            displayChecked,
-            onDisplayCheckedChange,
+            checked = displayChecked,
+            onCheckedChange = onDisplayCheckedChange,
             text = "Display Character"
         )
 
         // toggle music
         Toggle(
-            musicChecked,
-            onMusicCheckedChange,
+            checked = musicChecked,
+            onCheckedChange = onMusicCheckedChange,
             text = "Music"
         )
 
@@ -100,63 +124,86 @@ fun MenuBar(
 @Composable
 fun NavigateItem(
     destination: String,
-    icon: Int
+    icon: Int,
+    onClick: () -> Unit
 ) {
-    Row(
-        modifier = Modifier,
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    Button(
+        onClick = { onClick() },
+        contentPadding = PaddingValues(0.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black,
+            contentColor = LightPink
+        )
     ) {
-        Icon(
-            painter = painterResource(id = icon),
-            contentDescription = "$destination Icon",
-            tint = LightPink,
-            modifier = Modifier.size(40.dp)
-        )
+        Row(
+            modifier = Modifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = "$destination Icon",
+                tint = LightPink,
+                modifier = Modifier.size(40.dp)
+            )
 
-        Text(
-            text = destination,
-            color = LightPink,
-            fontSize = 25.sp
-        )
+            Text(
+                text = destination,
+                color = LightPink,
+                fontSize = 25.sp
+            )
+        }
     }
 }
 
 @Composable
-fun ProfileHeader() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(20.dp)
+fun ProfileHeader(
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = { onClick() },
+        contentPadding = PaddingValues(0.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black,
+            contentColor = LightPink
+        )
     ) {
-        // profile icon
-        Box(
-            modifier = Modifier
-                .size(60.dp)
-                .background(color = DarkBlue, shape = CircleShape)
-        ){
-            Icon(
-                painter = painterResource(id = R.drawable.profile_mask),
-                contentDescription = "Profile Icon",
-                tint = LightPink,
-                modifier = Modifier.size(50.dp).align(Alignment.Center)
-            )
-        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(15.dp)
+        ) {
+            // profile icon
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .background(color = DarkBlue, shape = CircleShape)
+            ){
+                Icon(
+                    painter = painterResource(id = R.drawable.profile_mask),
+                    contentDescription = "Profile Icon",
+                    tint = LightPink,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .align(Alignment.Center)
+                )
+            }
 
-        // profile name
-        Column(
-            modifier = Modifier,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ){
-            Text(
-                text = "Fem",
-                color = LightPink,
-                fontSize = 25.sp
-            )
-            Text(
-                text = "View Profile",
-                color = LightPink,
-                fontSize = 18.sp
-            )
+            // profile name
+            Column(
+                modifier = Modifier,
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ){
+                Text(
+                    text = "Fem",
+                    color = LightPink,
+                    fontSize = 25.sp
+                )
+                Text(
+                    text = "View Profile",
+                    color = LightPink,
+                    fontSize = 18.sp
+                )
+            }
         }
     }
 }
