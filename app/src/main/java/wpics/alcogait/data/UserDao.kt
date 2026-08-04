@@ -7,7 +7,7 @@ import androidx.room3.Query
 @Dao
 interface UserDao {
     @Query("SELECT * FROM users WHERE userId = :userId")
-    suspend fun getById(userId: Int): User
+    suspend fun getById(userId: Long): User
 
     @Query(
         """
@@ -18,5 +18,5 @@ interface UserDao {
     suspend fun findByName(first: String, last: String): User
 
     @Insert
-    suspend fun insertUser(user: User)
+    suspend fun insertUser(user: User): Long
 }

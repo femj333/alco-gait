@@ -181,4 +181,13 @@ class HomeViewModel(
         recorder.unregisterListeners()
         super.onCleared()
     }
+
+    fun insertUser(user: User) {
+        viewModelScope.launch {
+            val newUserId = walkRepository.insertUser(user)
+            _uiState.update {
+                it.copy(currentUser = walkRepository.getUserById(newUserId))
+            }
+        }
+    }
 }
