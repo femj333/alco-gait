@@ -185,13 +185,13 @@ fun ProfileHeader(
                 modifier = Modifier,
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ){
-                uiState.currentUser?.firstName?.let {
-                    Text(
-                        text = it,
-                        color = LightPink,
-                        fontSize = 25.sp
-                    )
-                }
+                val text = if (uiState.currentUser?.firstName != null) uiState.currentUser.firstName else "Login"
+                Text(
+                    text = text,
+                    color = LightPink,
+                    fontSize = 25.sp
+                )
+
                 Text(
                     text = "View Profile",
                     color = LightPink,

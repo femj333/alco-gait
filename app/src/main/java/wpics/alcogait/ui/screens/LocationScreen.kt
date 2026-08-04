@@ -47,6 +47,7 @@ fun LocationScreen(
         if (uiState.drinksList != null) {
             DrinkLocationMap(uiState.drinksList, uiState, viewModel)
         } else {
+            /* TODO -> add padding here only, and style it better */
             Text("No drinks have been recorded for this user yet, start recording on the home screen to log a drinking occasion")
         }
     }
