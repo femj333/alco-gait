@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import wpics.alcogait.AlcoGaitApp
 import wpics.alcogait.data.GaitAnalyzer
+import wpics.alcogait.data.User
 import wpics.alcogait.data.Walk
 import wpics.alcogait.data.WalkCSVWriter
 import wpics.alcogait.data.WalkRepository
@@ -70,6 +71,7 @@ class HomeViewModel(
             val z = data[3].toFloatOrNull()
             if (x!= null && y!= null && z!= null) analyzer.addSample(x, y, z)
         }
+
     }
 
     fun onStartClicked() {
