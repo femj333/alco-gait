@@ -15,22 +15,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import wpics.alcogait.Routes
 import wpics.alcogait.data.User
 import wpics.alcogait.viewmodels.HomeViewModel
 
 @Composable
 fun LoginScreen(
     padding: PaddingValues,
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    navController: NavHostController
 ) {
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var phoneNumber by remember { mutableStateOf("") }
+
     Box(
         modifier = Modifier.fillMaxSize().padding(padding)
     ) {
-        var firstName by remember { mutableStateOf("") }
-        var lastName by remember { mutableStateOf("") }
-        var email by remember { mutableStateOf("") }
-        var phoneNumber by remember { mutableStateOf("") }
-
         Column {
             TextField(
                 value = firstName,
@@ -66,6 +70,8 @@ fun LoginScreen(
                             phoneNumber = phoneNumber
                         )
                     )
+
+                    navController.navigate(Routes.Home.route)
                 }
             ){
                 Text("Sign Up")

@@ -122,7 +122,7 @@ fun MainScreen(
                     }
 
                     composable(Routes.Login.route) {
-                        LoginScreen(padding, viewModel)
+                        LoginScreen(padding, viewModel, navController)
                     }
                 }
             }
