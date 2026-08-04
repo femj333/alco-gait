@@ -11,9 +11,9 @@ class WalkRepository(
 
     suspend fun insertUser(user: User): Long = userDao.insertUser(user)
 
-    suspend fun getDrinksByUserId(userId: Int): List<Drinks> = drinksDao.getDrinksByUserId(userId)
+    suspend fun getDrinksByUserId(userId: Long): List<Drinks> = drinksDao.getDrinksByUserId(userId)
 
-    suspend fun getDrinksByUserIdAndTimestamp(userId: Int, timestamp: String): Drinks? =
+    suspend fun getDrinksByUserIdAndTimestamp(userId: Long, timestamp: String): Drinks? =
         drinksDao.getDrinksByUserIdAndTimestamp(userId, timestamp)
 
     suspend fun logDrink(drink: Drinks) = drinksDao.insertDrink(drink)

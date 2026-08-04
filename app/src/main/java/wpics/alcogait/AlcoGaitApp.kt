@@ -21,6 +21,7 @@ class AlcoGaitApp : Application() {
         var isNewDatabase = false
 
         database = Room.databaseBuilder(this, AppDatabase::class.java, "alcogait_db")
+            .fallbackToDestructiveMigration(dropAllTables = true)
             .addCallback(object : RoomDatabase.Callback() {
                 override suspend fun onCreate(connection: SQLiteConnection) {
                     super.onCreate(connection)

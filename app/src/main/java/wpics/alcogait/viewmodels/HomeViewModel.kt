@@ -1,10 +1,12 @@
 package wpics.alcogait.viewmodels
 
 import android.app.Application
+import android.location.Location
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.Dispatchers
@@ -18,13 +20,16 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import wpics.alcogait.AlcoGaitApp
+import wpics.alcogait.data.Drinks
 import wpics.alcogait.data.GaitAnalyzer
+import wpics.alcogait.data.LocationHelper
 import wpics.alcogait.data.User
 import wpics.alcogait.data.Walk
 import wpics.alcogait.data.WalkCSVWriter
 import wpics.alcogait.data.WalkRepository
 import wpics.alcogait.data.WalkSensorRecorder
 import java.io.File
+import java.time.Instant
 
 class HomeViewModel(
     application: Application,
@@ -60,6 +65,9 @@ class HomeViewModel(
     private var stopwatchJob: Job? = null
     private var recordingStartTime: Long = 0L
 
+    private var locationHelper = LocationHelper(application)
+    private var recordingLocation: Location? = null
+
     private val rootFolder = File(
         application.getExternalFilesDir(null), "AlcoGait/session_${System.currentTimeMillis()}"
     ).apply { mkdirs() }
@@ -77,6 +85,10 @@ class HomeViewModel(
     fun onStartClicked() {
         val walk = Walk()
         recorder.startRecording(walk)
+
+        viewModelScope.launch {
+            recordingLocation = locationHelper.getCurrentLocation()
+        }
 
         completedWindows = 0
         recordingStartTime = System.currentTimeMillis()
@@ -162,14 +174,35 @@ class HomeViewModel(
     }
 
     private fun saveWalk(walk: Walk) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val success = WalkCSVWriter.write(walk, rootFolder.absolutePath)
-            withContext(Dispatchers.Main) {
-                if (!success) {
-                    _uiState.update {
-                        it.copy(saveError = true)
-                        /* TODO -> do something on save error */
-                    }
+        val timestamp = Instant.ofEpochMilli(recordingStartTime).toString()
+
+        viewModelScope.launch{
+            // write to csv
+            val success = withContext(Dispatchers.IO) {
+                WalkCSVWriter.write(walk, rootFolder.absolutePath)
+            }
+
+            if (success) {
+                val userId = uiState.value.currentUser?.userId ?: 0
+
+                // save in database
+                walkRepository.logDrink(
+                    Drinks(
+                        userId = userId,
+                        latitude = recordingLocation?.latitude?.toFloat() ?: 0f,
+                        longitude = recordingLocation?.longitude?.toFloat() ?: 0f,
+                        timestamp = timestamp,
+                        drunkState = uiState.value.drunkState.label
+                    )
+                )
+                _uiState.update {
+                    it.copy(drinksList = walkRepository.getDrinksByUserId(userId))
+                }
+
+            } else {
+                _uiState.update {
+                    it.copy(saveError = true)
+                    /* TODO -> do something on save error */
                 }
             }
         }
