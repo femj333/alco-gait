@@ -50,12 +50,11 @@ fun TopBar(
     onMenuClick: () -> Unit,
     isLocationScreen: Boolean
 ) {
-    Box(
-        modifier = Modifier
-            .background(color = DarkBlue)
-            .fillMaxWidth()
-    ) {
-        if (isLocationScreen) {
+    if (isLocationScreen) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -71,7 +70,13 @@ fun TopBar(
 
                 HelpButton()
             }
-        } else {
+        }
+    } else {
+        Box(
+            modifier = Modifier
+                .background(color = DarkBlue)
+                .fillMaxWidth()
+        ) {
             MenuButton(
                 onMenuClick = onMenuClick,
                 barColors = LightPink

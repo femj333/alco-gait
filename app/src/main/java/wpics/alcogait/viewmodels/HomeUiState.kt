@@ -14,5 +14,6 @@ data class HomeUiState(
     val showMinRecordingAlert: Boolean = false,
     val elapsedMillis: Long = 0L,
     val currentUser: User? = null,
-    val drinksList: List<Drinks>? = null
+    val drinksList: List<Drinks>? = null,
+    val numDrinksAtLocation: HashMap<Pair<Float, Float>, Int>? = null
 )

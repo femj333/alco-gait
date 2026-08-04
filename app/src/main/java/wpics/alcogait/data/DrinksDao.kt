@@ -12,6 +12,9 @@ interface DrinksDao {
     @Query("SELECT * FROM drinks WHERE user_id = :userId AND timestamp = :timestamp")
     suspend fun getDrinksByUserIdAndTimestamp(userId: Long, timestamp: String): Drinks?
 
+    @Query("SELECT COUNT(*) FROM drinks WHERE user_id = :userId AND latitude = :latitude AND longitude = :longitude")
+    suspend fun getNumDrinksAtLocation(userId: Long, latitude: Float, longitude: Float): Int
+
     @Insert
     suspend fun insertDrink(drink: Drinks)
 }

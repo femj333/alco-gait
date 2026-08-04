@@ -17,4 +17,7 @@ class WalkRepository(
         drinksDao.getDrinksByUserIdAndTimestamp(userId, timestamp)
 
     suspend fun logDrink(drink: Drinks) = drinksDao.insertDrink(drink)
+
+    suspend fun getNumDrinksAtLocation(userId: Long, latitude: Float, longitude: Float): Int =
+        drinksDao.getNumDrinksAtLocation(userId, latitude, longitude)
 }

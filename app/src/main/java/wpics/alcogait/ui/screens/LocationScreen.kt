@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
@@ -20,13 +21,16 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import wpics.alcogait.R
 import wpics.alcogait.data.Drinks
 import wpics.alcogait.viewmodels.HomeUiState
+import wpics.alcogait.viewmodels.HomeViewModel
 
 @Composable
 fun LocationScreen(
     padding: PaddingValues,
-    uiState: HomeUiState
+    uiState: HomeUiState,
+    viewModel: HomeViewModel
 ) {
     Box(
         modifier = Modifier
@@ -40,7 +44,7 @@ fun LocationScreen(
             4. add pop up to display info about a location
         */
         if (uiState.drinksList != null) {
-            DrinkLocationMap(uiState.drinksList)
+            DrinkLocationMap(uiState.drinksList, uiState, viewModel)
         } else {
             Text("No drinks have been recorded for this user yet, start recording on the home screen to log a drinking occasion")
         }
@@ -50,7 +54,9 @@ fun LocationScreen(
 
 @Composable
 fun DrinkLocationMap(
-    drinksList: List<Drinks>
+    drinksList: List<Drinks>,
+    uiState: HomeUiState,
+    viewModel: HomeViewModel
 ) {
     // initial camera positioning
     val firstDrinkLatLng = LatLng(drinksList.first().latitude.toDouble(), drinksList.first().longitude.toDouble())
@@ -67,10 +73,13 @@ fun DrinkLocationMap(
 
             val drinkLatLng = LatLng(drink.latitude.toDouble(), drink.longitude.toDouble())
             val markerState = remember(drinkLatLng) { MarkerState(position = drinkLatLng) }
+            viewModel.getNumDrinksAtLocation(uiState.currentUser?.userId ?: 0, drink.latitude, drink.longitude)
+            val numDrinksAtLocation = uiState.numDrinksAtLocation?.get(Pair(drink.latitude, drink.longitude))
 
             Marker(
                 state = markerState,
-                title = "Drink Logged Here"
+                title = numDrinksAtLocation.toString().let { "Drank $it times here"},
+                icon = BitmapDescriptorFactory.fromResource(R.drawable.drink_pin_icon)
             )
         }
     }

@@ -114,7 +114,7 @@ fun MainScreen(
                     }
 
                     composable(Routes.Location.route) {
-                        LocationScreen(padding, uiState)
+                        LocationScreen(padding, uiState, viewModel)
                     }
 
                     composable(Routes.Rideshare.route) {
