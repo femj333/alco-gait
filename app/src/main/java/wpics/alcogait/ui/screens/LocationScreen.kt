@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -28,14 +30,13 @@ import wpics.alcogait.viewmodels.HomeViewModel
 
 @Composable
 fun LocationScreen(
-    padding: PaddingValues,
     uiState: HomeUiState,
     viewModel: HomeViewModel
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(padding)
+            .navigationBarsPadding()
     ) {
         /* TODO ->
             1. add scrollable google maps as background
@@ -48,7 +49,6 @@ fun LocationScreen(
         } else {
             Text("No drinks have been recorded for this user yet, start recording on the home screen to log a drinking occasion")
         }
-
     }
 }
 
