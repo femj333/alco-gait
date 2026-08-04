@@ -2,6 +2,7 @@ package wpics.alcogait
 
 import android.app.Application
 import androidx.room3.Room
+import wpics.alcogait.data.AppContainer
 import wpics.alcogait.data.AppDatabase
 
 class AlcoGaitApp : Application() {

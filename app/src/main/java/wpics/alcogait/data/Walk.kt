@@ -3,16 +3,12 @@ package wpics.alcogait.data
 import java.io.Serializable
 
 /**
- * Represents a single recorded "walk" trial of a given [WalkType] at a given BAC level. Captures:
+ * Represents a single recorded "walk" trial. Captures:
  *      - the phone's accelerometer
  *      - gyroscope
  *      - derived compass readings
  */
-class Walk(
-    private val walkNumber: Int,
-    private val bac: Double,
-    val walkType: WalkType
-): Serializable {
+class Walk(): Serializable {
     // Raw sensor readings collected during this walk
     private val phoneAccelerometerDataList = mutableListOf<Array<String>>()
     private val phoneGyroscopeDataList = mutableListOf<Array<String>>()
@@ -42,20 +38,13 @@ class Walk(
     fun getSampleSize(): Int =
          phoneAccelerometerDataList.size + phoneGyroscopeDataList.size + compassDataList.size + watchSampleSize
 
-    fun getBAC() = bac
-    fun getWalkNumber() = walkNumber
-
     /**
      * Builds this walk's data as a list of CSV rows:
-     *      - BAC header line
      *      - each sensor's section (title row, column-header row, data rows), separated by blank rows
      */
     fun toCSVFormat(): List<Array<String>> {
         val space = arrayOf("")
         val result = mutableListOf<Array<String>>()
-
-        result.add(arrayOf("BAC = $bac"))
-        result.add(space)
 
         result.add(arrayOf("ACCELEROMETER DATA (PHONE)"))
         result.add(arrayOf("Sensor Name", "X", "Y", "Z", "Accuracy", "Timestamp"))

@@ -53,6 +53,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-drawablepainter:0.37.3")
     implementation("com.opencsv:opencsv:4.0")
     implementation(libs.androidx.compose.foundation.layout)
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.8.7")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation(libs.androidx.compose.ui.text)
     implementation(libs.androidx.navigation.compose)

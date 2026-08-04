@@ -73,7 +73,7 @@ fun formatElapsed(millis: Long): String {
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = viewModel(),
+    viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
     displayCharacter: Boolean,
     padding: PaddingValues
 ) {

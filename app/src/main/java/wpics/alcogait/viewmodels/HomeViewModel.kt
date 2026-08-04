@@ -2,7 +2,11 @@ package wpics.alcogait.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -13,23 +17,34 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import wpics.alcogait.R
+import wpics.alcogait.AlcoGaitApp
 import wpics.alcogait.data.GaitAnalyzer
 import wpics.alcogait.data.Walk
 import wpics.alcogait.data.WalkCSVWriter
-import wpics.alcogait.data.WalkHolder
+import wpics.alcogait.data.WalkRepository
 import wpics.alcogait.data.WalkSensorRecorder
-import wpics.alcogait.data.WalkType
-import wpics.alcogait.models.DrunkState
 import java.io.File
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
+class HomeViewModel(
+    application: Application,
+    private val walkRepository: WalkRepository
+) : AndroidViewModel(application) {
 
     companion object {
         // 20 second recordings
         private const val WINDOW_DURATION_MS = 20_000L
         // stopwatch tick delay
         private const val STOPWATCH_TICK_MS = 100L
+
+        val Factory : ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = (this[APPLICATION_KEY] as AlcoGaitApp)
+                HomeViewModel(
+                    application = application,
+                    walkRepository = application.container.walkRepository
+                )
+            }
+        }
     }
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -44,8 +59,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private var stopwatchJob: Job? = null
     private var recordingStartTime: Long = 0L
 
-    private var walkHolder = WalkHolder(1)
-    private var currentWalkType: WalkType? = WalkType.NORMAL
     private val rootFolder = File(
         application.getExternalFilesDir(null), "AlcoGait/session_${System.currentTimeMillis()}"
     ).apply { mkdirs() }
@@ -60,8 +73,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun onStartClicked() {
-        val walkType = currentWalkType ?: return
-        val walk = Walk(walkHolder.walkNumber, bac = 0.0, walkType = walkType)
+        val walk = Walk()
         recorder.startRecording(walk)
 
         completedWindows = 0
@@ -118,12 +130,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         stopwatchJob?.cancel()
         stopwatchJob = null
         recorder.stopRecording()
-
-        // persist this walk, advance to next walk type
-        val walk = uiState.value.currentWalk
-        if (currentWalkType != null && walk != null){
-            walkHolder = walkHolder.addWalk(walk)
-        }
+        val completedWalk = _uiState.value.currentWalk
 
         // under 20 seconds recorded, not enough data
         if (completedWindows == 0) {
@@ -143,13 +150,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     elapsedMillis = 0L
                 )
             }
-        }
 
-        currentWalkType = walkHolder.getNextWalkType()
-        // all walk types completed
-        if (currentWalkType == null) {
-            // save all walks
-            saveWalkHolder()
+            completedWalk?.let { saveWalk(it) }
         }
     }
 
@@ -157,16 +159,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update { it.copy(showMinRecordingAlert = false) }
     }
 
-    private fun saveWalkHolder() {
-        val holderToSave = walkHolder
+    private fun saveWalk(walk: Walk) {
         viewModelScope.launch(Dispatchers.IO) {
-            val success = WalkCSVWriter.write(holderToSave, rootFolder.absolutePath)
+            val success = WalkCSVWriter.write(walk, rootFolder.absolutePath)
             withContext(Dispatchers.Main) {
-                if (success) {
-                    walkHolder = WalkHolder(walkHolder.walkNumber + 1)
-                    currentWalkType = walkHolder.getNextWalkType()
-                } else {
-                    _uiState.update { it.copy(saveError = true) }
+                if (!success) {
+                    _uiState.update {
+                        it.copy(saveError = true)
+                        /* TODO -> do something on save error */
+                    }
                 }
             }
         }
