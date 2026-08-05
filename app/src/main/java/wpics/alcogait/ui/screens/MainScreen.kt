@@ -1,14 +1,14 @@
-package wpics.alcogait.ui
+package wpics.alcogait.ui.screens
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -25,9 +26,12 @@ import androidx.navigation.compose.rememberNavController
 import wpics.alcogait.Routes
 import wpics.alcogait.ui.components.MenuBar
 import wpics.alcogait.ui.components.TopBar
+import wpics.alcogait.viewmodels.HomeViewModel
 
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory)
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -42,6 +46,8 @@ fun MainScreen() {
         targetValue = if (menuBarVisible) menuWidth else 0.dp,
         label = "contentOffset"
     )
+
+    val uiState by viewModel.uiState.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -58,7 +64,8 @@ fun MainScreen() {
                 onDisplayCheckedChange = { displayCharacter = it },
                 musicChecked = playMusic,
                 onMusicCheckedChange = { playMusic = it },
-                navController = navController
+                navController = navController,
+                uiState = uiState
             )
         }
 
@@ -88,9 +95,14 @@ fun MainScreen() {
                     }
                 }
             ) { padding ->
-                NavHost(navController = navController, startDestination = Routes.Home.route) {
+                NavHost(navController = navController, startDestination = Routes.Login.route) {
                     composable(Routes.Home.route) {
-                        HomeScreen(displayCharacter = displayCharacter, padding = padding)
+                        HomeScreen(
+                            displayCharacter = displayCharacter,
+                            padding = padding,
+                            uiState = uiState,
+                            viewModel = viewModel
+                        )
                     }
 
                     composable(Routes.Time.route) {
@@ -102,11 +114,15 @@ fun MainScreen() {
                     }
 
                     composable(Routes.Location.route) {
-                        LocationScreen(padding)
+                        LocationScreen(padding, uiState, viewModel)
                     }
 
                     composable(Routes.Rideshare.route) {
                         RideshareScreen(padding)
+                    }
+
+                    composable(Routes.Login.route) {
+                        LoginScreen(padding, viewModel, navController)
                     }
                 }
             }

@@ -50,10 +50,12 @@ fun TopBar(
     onMenuClick: () -> Unit,
     isLocationScreen: Boolean
 ) {
+    val backgroundColor = if (isLocationScreen) Color.Transparent else DarkBlue
+
     Box(
         modifier = Modifier
-            .background(color = DarkBlue)
             .fillMaxWidth()
+            .background(backgroundColor)
     ) {
         if (isLocationScreen) {
             Row(

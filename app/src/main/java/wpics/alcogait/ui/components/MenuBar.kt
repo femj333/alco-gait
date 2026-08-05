@@ -1,15 +1,12 @@
 package wpics.alcogait.ui.components
 
 
-import android.hardware.lights.Light
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -18,23 +15,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,8 +31,8 @@ import androidx.navigation.NavController
 import wpics.alcogait.R
 import wpics.alcogait.Routes
 import wpics.alcogait.ui.theme.DarkBlue
-import wpics.alcogait.ui.theme.LightBlue
 import wpics.alcogait.ui.theme.LightPink
+import wpics.alcogait.viewmodels.HomeUiState
 
 @Composable
 fun MenuBar(
@@ -51,7 +40,8 @@ fun MenuBar(
     onDisplayCheckedChange: (Boolean) -> Unit,
     musicChecked: Boolean,
     onMusicCheckedChange: (Boolean) -> Unit,
-    navController: NavController
+    navController: NavController,
+    uiState: HomeUiState
 ){
     Column(
         modifier = Modifier
@@ -64,7 +54,8 @@ fun MenuBar(
     ) {
         // profile header
         ProfileHeader(
-            onClick = { navController.navigate(Routes.Profile.route) }
+            onClick = { navController.navigate(Routes.Profile.route) },
+            uiState = uiState
         )
 
         HorizontalDivider(
@@ -158,7 +149,8 @@ fun NavigateItem(
 
 @Composable
 fun ProfileHeader(
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    uiState: HomeUiState
 ) {
     Button(
         onClick = { onClick() },
@@ -193,11 +185,13 @@ fun ProfileHeader(
                 modifier = Modifier,
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ){
+                val text = if (uiState.currentUser?.firstName != null) uiState.currentUser.firstName else "Login"
                 Text(
-                    text = "Fem",
+                    text = text,
                     color = LightPink,
                     fontSize = 25.sp
                 )
+
                 Text(
                     text = "View Profile",
                     color = LightPink,
