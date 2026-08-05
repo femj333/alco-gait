@@ -53,24 +53,23 @@ import wpics.alcogait.ui.theme.DarkBlue
 import wpics.alcogait.ui.theme.LightPink
 import wpics.alcogait.viewmodels.HomeUiState
 import wpics.alcogait.viewmodels.HomeViewModel
+import wpics.alcogait.viewmodels.LocationUiState
+import wpics.alcogait.viewmodels.LocationViewModel
 
 @Composable
 fun LocationScreen(
     padding: PaddingValues,
-    uiState: HomeUiState,
-    viewModel: HomeViewModel
+    locationUiState: LocationUiState,
+    homeUiState: HomeUiState,
+    locationViewModel: LocationViewModel
 ) {
-
-    /* TODO ->
-        1. add pop up to display info about a location
-    */
-    if (uiState.drinksList != null) {
+    if (homeUiState.drinksList != null) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .navigationBarsPadding()
         ) {
-            DrinkLocationMap(uiState.drinksList, uiState, viewModel)
+            DrinkLocationMap(homeUiState.drinksList, locationUiState, homeUiState, locationViewModel)
         }
     } else {
         Box(
@@ -96,8 +95,9 @@ fun LocationScreen(
 @Composable
 fun DrinkLocationMap(
     drinksList: List<Drinks>,
-    uiState: HomeUiState,
-    viewModel: HomeViewModel
+    locationUiState: LocationUiState,
+    homeUiState: HomeUiState,
+    locationViewModel: LocationViewModel
 ) {
     var selectedDrink by remember { mutableStateOf<Drinks?>(null) }
 
@@ -116,14 +116,14 @@ fun DrinkLocationMap(
             cameraPositionState = cameraPositionState
         ) {
             drinksList.forEach { drink ->
-                val userId = uiState.currentUser?.userId ?: 0
+                val userId = homeUiState.currentUser?.userId ?: 0
                 val lat = drink.latitude
                 val long = drink.longitude
 
                 val drinkLatLng = LatLng(lat.toDouble(), long.toDouble())
                 val markerState = remember(drinkLatLng) { MarkerState(position = drinkLatLng) }
-                viewModel.getNumDrinksAtLocation(userId, lat, long)
-                val numDrinksAtLocation = uiState.numDrinksAtLocation?.get(Pair(lat, long))
+                locationViewModel.getNumDrinksAtLocation(userId, lat, long)
+                val numDrinksAtLocation = locationUiState.numDrinksAtLocation?.get(Pair(lat, long))
 
                 Marker(
                     state = markerState,
@@ -151,9 +151,9 @@ fun DrinkLocationMap(
         ) {
             selectedDrink?.let { drink ->
                 LocationPopUp(
-                    viewModel = viewModel,
+                    locationViewModel = locationViewModel,
                     drink = drink,
-                    uiState = uiState,
+                    locationUiState = locationUiState,
                     onDismiss = { selectedDrink = null }
                 )
             }
@@ -163,18 +163,25 @@ fun DrinkLocationMap(
 
 @Composable
 fun LocationPopUp(
-    viewModel: HomeViewModel,
+    locationViewModel: LocationViewModel,
     drink: Drinks,
-    uiState: HomeUiState,
+    locationUiState: LocationUiState,
     onDismiss: () -> Unit
 ) {
     LaunchedEffect(drink) {
-        viewModel.getTimeAndPlaceOfDrinksAtLocation(
+        locationViewModel.getTimeAndPlaceOfDrinksAtLocation(
             drink.userId,
             drink.latitude,
-            drink.longitude)
+            drink.longitude
+        )
+        locationViewModel.getAddressFromCoordinates(
+            drink.latitude,
+            drink.longitude
+        )
     }
-    val timeAndPlaceOfDrinks = uiState.timeAndPlaceOfDrinks
+
+    val timeAndPlaceOfDrinks = locationUiState.timeAndPlaceOfDrinks
+    val address = locationUiState.address
 
     Box(
         modifier = Modifier
@@ -205,10 +212,19 @@ fun LocationPopUp(
         Column(
             modifier = Modifier
         ) {
-            Text(
-                text = "Location",
-                color = DarkBlue,
-            )
+            if (address != null) {
+                Text(
+                    text = address,
+                    color = DarkBlue,
+                )
+            } else {
+                locationUiState.errorMessage?.let {
+                    Text(
+                        text = it,
+                        color = DarkBlue,
+                    )
+                }
+            }
 
             Text(
                 text = "History",
