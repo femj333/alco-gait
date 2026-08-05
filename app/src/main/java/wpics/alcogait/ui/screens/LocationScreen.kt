@@ -1,5 +1,11 @@
 package wpics.alcogait.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,12 +14,30 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -25,30 +49,46 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import wpics.alcogait.R
 import wpics.alcogait.data.Drinks
+import wpics.alcogait.ui.theme.DarkBlue
+import wpics.alcogait.ui.theme.LightPink
 import wpics.alcogait.viewmodels.HomeUiState
 import wpics.alcogait.viewmodels.HomeViewModel
 
 @Composable
 fun LocationScreen(
+    padding: PaddingValues,
     uiState: HomeUiState,
     viewModel: HomeViewModel
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding()
-    ) {
-        /* TODO ->
-            1. add scrollable google maps as background
-            2. save previous drinking locations in database -> need drinking permissions
-            3. access database to display drink icons with number of times drank at a certain location
-            4. add pop up to display info about a location
-        */
-        if (uiState.drinksList != null) {
+
+    /* TODO ->
+        1. add pop up to display info about a location
+    */
+    if (uiState.drinksList != null) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .navigationBarsPadding()
+        ) {
             DrinkLocationMap(uiState.drinksList, uiState, viewModel)
-        } else {
-            /* TODO -> add padding here only, and style it better */
-            Text("No drinks have been recorded for this user yet, start recording on the home screen to log a drinking occasion")
+        }
+    } else {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(DarkBlue)
+                .padding(padding)
+        ) {
+            Text(
+                text = "No drinks have been recorded for this user yet. Start recording on the " +
+                        "home screen to log a drinking occasion.",
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(start = 10.dp, end = 10.dp),
+                textAlign = TextAlign.Center,
+                color = LightPink,
+                fontSize = 30.sp
+            )
         }
     }
 }
@@ -59,29 +99,135 @@ fun DrinkLocationMap(
     uiState: HomeUiState,
     viewModel: HomeViewModel
 ) {
+    var selectedDrink by remember { mutableStateOf<Drinks?>(null) }
+
     // initial camera positioning
     val firstDrinkLatLng = LatLng(drinksList.first().latitude.toDouble(), drinksList.first().longitude.toDouble())
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(firstDrinkLatLng, 15f)
     }
 
-    GoogleMap(
+    Box(
         modifier = Modifier
-            .fillMaxSize(),
-        cameraPositionState = cameraPositionState
     ) {
-        drinksList.forEach { drink ->
+        GoogleMap(
+            modifier = Modifier
+                .fillMaxSize(),
+            cameraPositionState = cameraPositionState
+        ) {
+            drinksList.forEach { drink ->
+                val userId = uiState.currentUser?.userId ?: 0
+                val lat = drink.latitude
+                val long = drink.longitude
 
-            val drinkLatLng = LatLng(drink.latitude.toDouble(), drink.longitude.toDouble())
-            val markerState = remember(drinkLatLng) { MarkerState(position = drinkLatLng) }
-            viewModel.getNumDrinksAtLocation(uiState.currentUser?.userId ?: 0, drink.latitude, drink.longitude)
-            val numDrinksAtLocation = uiState.numDrinksAtLocation?.get(Pair(drink.latitude, drink.longitude))
+                val drinkLatLng = LatLng(lat.toDouble(), long.toDouble())
+                val markerState = remember(drinkLatLng) { MarkerState(position = drinkLatLng) }
+                viewModel.getNumDrinksAtLocation(userId, lat, long)
+                val numDrinksAtLocation = uiState.numDrinksAtLocation?.get(Pair(lat, long))
 
-            Marker(
-                state = markerState,
-                title = numDrinksAtLocation.toString().let { "Drank $it times here"},
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.drink_pin_icon)
+                Marker(
+                    state = markerState,
+                    title = numDrinksAtLocation.toString().let { "Drank $it times here"},
+                    icon = BitmapDescriptorFactory.fromResource(R.drawable.drink_pin_icon),
+                    onClick = {
+                        selectedDrink = drink
+                        true
+                    }
+                )
+            }
+        }
+
+        AnimatedVisibility(
+            visible = selectedDrink != null,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 20.dp),
+            enter = slideInVertically(
+                initialOffsetY = { it }
+            ) + fadeIn(),
+            exit = slideOutVertically(
+                targetOffsetY = { it }
+            ) + fadeOut()
+        ) {
+            selectedDrink?.let { drink ->
+                LocationPopUp(
+                    viewModel = viewModel,
+                    drink = drink,
+                    uiState = uiState,
+                    onDismiss = { selectedDrink = null }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun LocationPopUp(
+    viewModel: HomeViewModel,
+    drink: Drinks,
+    uiState: HomeUiState,
+    onDismiss: () -> Unit
+) {
+    LaunchedEffect(drink) {
+        viewModel.getTimeAndPlaceOfDrinksAtLocation(
+            drink.userId,
+            drink.latitude,
+            drink.longitude)
+    }
+    val timeAndPlaceOfDrinks = uiState.timeAndPlaceOfDrinks
+
+    Box(
+        modifier = Modifier
+            .width(320.dp)
+            .dropShadow(
+                shape = RoundedCornerShape(20.dp),
+                shadow = Shadow(
+                    radius = 4.dp,
+                    spread = 0.dp,
+                    color = Color.Black.copy(alpha = 0.4f),
+                    offset = DpOffset(x = 0.dp, y = 2.dp)
+                )
             )
+            .dropShadow(
+                shape = RoundedCornerShape(20.dp),
+                shadow = Shadow(
+                    radius = 13.dp,
+                    spread = (-3).dp,
+                    color = Color.Black.copy(alpha = 0.3f),
+                    offset = DpOffset(x = 0.dp, y = 7.dp)
+                )
+            )
+            .clip(RoundedCornerShape(20.dp))
+            .background(Color.White)
+            .padding(20.dp)
+    ) {
+
+        Column(
+            modifier = Modifier
+        ) {
+            Text(
+                text = "Location",
+                color = DarkBlue,
+            )
+
+            Text(
+                text = "History",
+                color = Color.Black,
+            )
+
+            timeAndPlaceOfDrinks?.forEach { drink ->
+                Text(
+                    text = "${drink.first}: ${drink.second}",
+                    color = DarkBlue
+                )
+            }
+
+            Button(
+                onClick = onDismiss,
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text("Close")
+            }
         }
     }
 }

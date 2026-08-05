@@ -232,4 +232,14 @@ class HomeViewModel(
             }
         }
     }
+
+    fun getTimeAndPlaceOfDrinksAtLocation(userId: Long, latitude: Float, longitude: Float) {
+        viewModelScope.launch {
+            val timeAndPlaceOfDrinks =
+                walkRepository.getTimeAndPlaceOfDrinksAtLocation(userId, latitude, longitude)
+            _uiState.update {
+                it.copy(timeAndPlaceOfDrinks = timeAndPlaceOfDrinks)
+            }
+        }
+    }
 }

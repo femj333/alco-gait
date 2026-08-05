@@ -20,4 +20,7 @@ class WalkRepository(
 
     suspend fun getNumDrinksAtLocation(userId: Long, latitude: Float, longitude: Float): Int =
         drinksDao.getNumDrinksAtLocation(userId, latitude, longitude)
+
+    suspend fun getTimeAndPlaceOfDrinksAtLocation(userId: Long, latitude: Float, longitude: Float): List<Pair<String, String?>> =
+        drinksDao.getTimeAndPlaceOfDrinksAtLocation(userId, latitude, longitude)
 }
