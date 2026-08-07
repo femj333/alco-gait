@@ -7,14 +7,12 @@ import wpics.alcogait.data.Walk
 import wpics.alcogait.models.DrunkState
 
 data class HomeUiState(
+    val currentUser: User? = null,
     val isRecording: Boolean = false,
     val drunkState: DrunkState = DrunkState(),
     val currentWalk: Walk? = null,
+    val drinksList: List<Drinks>? = null,
     val saveError: Boolean = false,
     val showMinRecordingAlert: Boolean = false,
     val elapsedMillis: Long = 0L,
-    val currentUser: User? = null,
-    val drinksList: List<Drinks>? = null,
-    val numDrinksAtLocation: HashMap<Pair<Float, Float>, Int>? = null,
-    val timeAndPlaceOfDrinks: List<Pair<String, String?>>? = null
 )

@@ -27,10 +27,12 @@ import wpics.alcogait.Routes
 import wpics.alcogait.ui.components.MenuBar
 import wpics.alcogait.ui.components.TopBar
 import wpics.alcogait.viewmodels.HomeViewModel
+import wpics.alcogait.viewmodels.LocationViewModel
 
 @Composable
 fun MainScreen(
-    viewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory)
+    homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
+    locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -47,7 +49,8 @@ fun MainScreen(
         label = "contentOffset"
     )
 
-    val uiState by viewModel.uiState.collectAsState()
+    val homeUiState by homeViewModel.uiState.collectAsState()
+    val locationUiState by locationViewModel.uiState.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -65,7 +68,7 @@ fun MainScreen(
                 musicChecked = playMusic,
                 onMusicCheckedChange = { playMusic = it },
                 navController = navController,
-                uiState = uiState
+                uiState = homeUiState
             )
         }
 
@@ -100,8 +103,8 @@ fun MainScreen(
                         HomeScreen(
                             displayCharacter = displayCharacter,
                             padding = padding,
-                            uiState = uiState,
-                            viewModel = viewModel
+                            uiState = homeUiState,
+                            viewModel = homeViewModel
                         )
                     }
 
@@ -114,7 +117,7 @@ fun MainScreen(
                     }
 
                     composable(Routes.Location.route) {
-                        LocationScreen(padding, uiState, viewModel)
+                        LocationScreen(padding, locationUiState, homeUiState, locationViewModel)
                     }
 
                     composable(Routes.Rideshare.route) {
@@ -122,7 +125,7 @@ fun MainScreen(
                     }
 
                     composable(Routes.Login.route) {
-                        LoginScreen(padding, viewModel, navController)
+                        LoginScreen(padding, homeViewModel, navController)
                     }
                 }
             }

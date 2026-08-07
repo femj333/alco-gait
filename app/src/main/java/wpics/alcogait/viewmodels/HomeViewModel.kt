@@ -224,22 +224,4 @@ class HomeViewModel(
         }
     }
 
-    fun getNumDrinksAtLocation(userId: Long, latitude: Float, longitude: Float) {
-        viewModelScope.launch {
-            val numDrinks = walkRepository.getNumDrinksAtLocation(userId, latitude, longitude)
-            _uiState.update {
-                it.copy(numDrinksAtLocation = hashMapOf(Pair(latitude, longitude) to numDrinks))
-            }
-        }
-    }
-
-    fun getTimeAndPlaceOfDrinksAtLocation(userId: Long, latitude: Float, longitude: Float) {
-        viewModelScope.launch {
-            val timeAndPlaceOfDrinks =
-                walkRepository.getTimeAndPlaceOfDrinksAtLocation(userId, latitude, longitude)
-            _uiState.update {
-                it.copy(timeAndPlaceOfDrinks = timeAndPlaceOfDrinks)
-            }
-        }
-    }
 }
