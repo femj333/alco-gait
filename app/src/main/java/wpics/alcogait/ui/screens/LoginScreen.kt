@@ -33,7 +33,9 @@ fun LoginScreen(
     var phoneNumber by remember { mutableStateOf("") }
 
     Box(
-        modifier = Modifier.fillMaxSize().padding(padding)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
     ) {
         Column {
             TextField(
