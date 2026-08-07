@@ -39,7 +39,9 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import wpics.alcogait.R
+import wpics.alcogait.Routes
 import wpics.alcogait.ui.theme.DarkBlue
 import wpics.alcogait.ui.theme.LightBlue
 import wpics.alcogait.ui.theme.LightGray
@@ -47,8 +49,10 @@ import wpics.alcogait.ui.theme.LightPink
 
 @Composable
 fun TopBar(
-    onMenuClick: () -> Unit,
-    isLocationScreen: Boolean
+    onMenuClick: () -> Unit = {},
+    isLocationScreen: Boolean = false,
+    isLogin: Boolean = false,
+    navController: NavHostController? = null
 ) {
     val backgroundColor = if (isLocationScreen) Color.Transparent else DarkBlue
 
@@ -73,11 +77,44 @@ fun TopBar(
 
                 HelpButton()
             }
+        } else if (isLogin) {
+            LoginSignupHeader(
+                navController
+            )
         } else {
             MenuButton(
                 onMenuClick = onMenuClick,
                 barColors = LightPink
             )
+        }
+    }
+}
+
+@Composable
+fun LoginSignupHeader(
+    navController: NavHostController?
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(DarkBlue)
+    ) {
+        // login screen
+        Button(
+            onClick = {
+                navController?.navigate(Routes.Login.route)
+            }
+        ) {
+            Text(text = "Login")
+        }
+
+        // signup screen
+        Button(
+            onClick = {
+                navController?.navigate(Routes.Signup.route)
+            }
+        ) {
+            Text(text = "Sign Up")
         }
     }
 }

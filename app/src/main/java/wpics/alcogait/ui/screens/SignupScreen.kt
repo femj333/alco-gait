@@ -51,72 +51,68 @@ fun SignupScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            LoginSignupHeader(navController)
+            TextField(
+                value = firstName,
+                onValueChange = { newText -> firstName = newText },
+                label = { Text("Enter your first name") }
+            )
 
-            Column {
-                TextField(
-                    value = firstName,
-                    onValueChange = { newText -> firstName = newText },
-                    label = { Text("Enter your first name") }
-                )
+            TextField(
+                value = lastName,
+                onValueChange = { newText -> lastName = newText },
+                label = { Text("Enter your last name") }
+            )
 
-                TextField(
-                    value = lastName,
-                    onValueChange = { newText -> lastName = newText },
-                    label = { Text("Enter your last name") }
-                )
+            TextField(
+                value = email,
+                onValueChange = { newText -> email = newText },
+                label = { Text("Enter your email") }
+            )
 
-                TextField(
-                    value = email,
-                    onValueChange = { newText -> email = newText },
-                    label = { Text("Enter your email") }
-                )
+            TextField(
+                value = phoneNumber,
+                onValueChange = { newText -> phoneNumber = newText },
+                label = { Text("Enter your phone number") }
+            )
 
-                TextField(
-                    value = phoneNumber,
-                    onValueChange = { newText -> phoneNumber = newText },
-                    label = { Text("Enter your phone number") }
-                )
+            TextField(
+                value = username,
+                onValueChange = { newText -> username = newText },
+                label = { Text("Enter your username") }
+            )
 
-                TextField(
-                    value = username,
-                    onValueChange = { newText -> username = newText },
-                    label = { Text("Enter your username") }
-                )
+            TextField(
+                value = password,
+                onValueChange = { newText -> password = newText },
+                label = { Text("Enter your password") }
+            )
 
-                TextField(
-                    value = password,
-                    onValueChange = { newText -> password = newText },
-                    label = { Text("Enter your password") }
-                )
+            Button(
+                onClick = {
+                    val passwordChars = password.toCharArray()
 
-                Button(
-                    onClick = {
-                        val passwordChars = password.toCharArray()
-
-                        viewModel.registerUser(
-                            username,
-                            passwordChars,
-                            firstName,
-                            lastName,
-                            email,
-                            phoneNumber
-                        )
-
-                        // clear password
-                        passwordChars.fill('\u0000')
-                        password = ""
-                    }
-                ) {
-                    Text("Sign Up")
-                }
-
-                if (uiState.errorMessage != null) {
-                    Text(
-                        text = uiState.errorMessage,
-                        color = Color.Red
+                    viewModel.registerUser(
+                        username,
+                        passwordChars,
+                        firstName,
+                        lastName,
+                        email,
+                        phoneNumber
                     )
+
+                    // clear password
+                    passwordChars.fill('\u0000')
+                    password = ""
                 }
+            ) {
+                Text("Sign Up")
+            }
+
+            if (uiState.errorMessage != null) {
+                Text(
+                    text = uiState.errorMessage,
+                    color = Color.Red
+                )
             }
         }
     }

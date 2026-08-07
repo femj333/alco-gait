@@ -90,10 +90,14 @@ fun MainScreen(
                             onMenuClick = { menuBarVisible = !menuBarVisible },
                             isLocationScreen = true
                         )
+                    } else if (currentRoute == "Login" || currentRoute == "Signup"){
+                        TopBar(
+                            isLogin = true,
+                            navController = navController
+                        )
                     } else {
                         TopBar(
-                            onMenuClick = { menuBarVisible = !menuBarVisible },
-                            isLocationScreen = false
+                            onMenuClick = { menuBarVisible = !menuBarVisible }
                         )
                     }
                 }

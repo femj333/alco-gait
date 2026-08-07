@@ -54,49 +54,42 @@ fun LoginScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // login/signup header
-            LoginSignupHeader(navController)
+            TextField(
+                value = username,
+                onValueChange = { newText -> username = newText },
+                label = { Text("Enter your username") }
+            )
 
-            Column {
-                TextField(
-                    value = username,
-                    onValueChange = { newText -> username = newText },
-                    label = { Text("Enter your username") }
-                )
-
-                TextField(
-                    value = password,
-                    onValueChange = { newText -> password = newText },
-                    label = { Text("Enter your password") }
-                )
+            TextField(
+                value = password,
+                onValueChange = { newText -> password = newText },
+                label = { Text("Enter your password") }
+            )
 
 
-                Button(
-                    onClick = {
-                        val passwordChars = password.toCharArray()
+            Button(
+                onClick = {
+                    val passwordChars = password.toCharArray()
 
-                        viewModel.loginUser(
-                            username,
-                            passwordChars
-                        )
-
-                        // clear password
-                        passwordChars.fill('\u0000')
-                        password = ""
-                    }
-                ) {
-                    Text("Login")
-                }
-
-                if (uiState.errorMessage != null) {
-                    Text(
-                        text = uiState.errorMessage,
-                        color = Color.Red
+                    viewModel.loginUser(
+                        username,
+                        passwordChars
                     )
+
+                    // clear password
+                    passwordChars.fill('\u0000')
+                    password = ""
                 }
+            ) {
+                Text("Login")
             }
 
+            if (uiState.errorMessage != null) {
+                Text(
+                    text = uiState.errorMessage,
+                    color = Color.Red
+                )
+            }
         }
-
     }
 }
