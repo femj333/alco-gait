@@ -68,7 +68,9 @@ fun MainScreen(
                 musicChecked = playMusic,
                 onMusicCheckedChange = { playMusic = it },
                 navController = navController,
-                uiState = homeUiState
+                uiState = homeUiState,
+                viewModel = homeViewModel,
+                onCloseMenu = { menuBarVisible = false }
             )
         }
 
@@ -90,10 +92,21 @@ fun MainScreen(
                             onMenuClick = { menuBarVisible = !menuBarVisible },
                             isLocationScreen = true
                         )
+                    } else if (currentRoute == "Login"){
+                        TopBar(
+                            isLogin = true,
+                            navController = navController,
+                            route = "Login"
+                        )
+                    } else if (currentRoute == "Signup") {
+                        TopBar(
+                            isLogin = true,
+                            navController = navController,
+                            route = "Signup"
+                        )
                     } else {
                         TopBar(
-                            onMenuClick = { menuBarVisible = !menuBarVisible },
-                            isLocationScreen = false
+                            onMenuClick = { menuBarVisible = !menuBarVisible }
                         )
                     }
                 }
@@ -117,7 +130,7 @@ fun MainScreen(
                     }
 
                     composable(Routes.Location.route) {
-                        LocationScreen(padding, locationUiState, homeUiState, locationViewModel)
+                        LocationScreen(padding, locationUiState, homeUiState, locationViewModel, homeViewModel)
                     }
 
                     composable(Routes.Rideshare.route) {
@@ -125,7 +138,11 @@ fun MainScreen(
                     }
 
                     composable(Routes.Login.route) {
-                        LoginScreen(padding, homeViewModel, navController)
+                        LoginScreen(padding, homeViewModel, navController, homeUiState)
+                    }
+
+                    composable(Routes.Signup.route) {
+                        SignupScreen(homeViewModel, navController, homeUiState, padding)
                     }
                 }
             }

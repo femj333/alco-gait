@@ -1,6 +1,8 @@
 package wpics.alcogait.ui.components
 
+import android.hardware.lights.Light
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.BorderStroke
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,13 +35,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import wpics.alcogait.R
+import wpics.alcogait.Routes
 import wpics.alcogait.ui.theme.DarkBlue
 import wpics.alcogait.ui.theme.LightBlue
 import wpics.alcogait.ui.theme.LightGray
@@ -47,8 +52,11 @@ import wpics.alcogait.ui.theme.LightPink
 
 @Composable
 fun TopBar(
-    onMenuClick: () -> Unit,
-    isLocationScreen: Boolean
+    onMenuClick: () -> Unit = {},
+    isLocationScreen: Boolean = false,
+    isLogin: Boolean = false,
+    navController: NavHostController? = null,
+    route: String = ""
 ) {
     val backgroundColor = if (isLocationScreen) Color.Transparent else DarkBlue
 
@@ -73,11 +81,57 @@ fun TopBar(
 
                 HelpButton()
             }
+        } else if (isLogin) {
+            LoginSignupHeader(navController, route)
         } else {
             MenuButton(
                 onMenuClick = onMenuClick,
                 barColors = LightPink
             )
+        }
+    }
+}
+
+@Composable
+fun LoginSignupHeader(
+    navController: NavHostController?,
+    route: String
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(DarkBlue),
+        horizontalArrangement = Arrangement
+            .spacedBy(space = 10.dp, alignment = Alignment.CenterHorizontally)
+    ) {
+        // login screen
+        Button(
+            onClick = {
+                navController?.navigate(Routes.Login.route)
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (route == "Login") LightPink else DarkBlue,
+                contentColor = if (route == "Login") DarkBlue else LightPink
+            ),
+            shape = RoundedCornerShape(10.dp),
+            border = BorderStroke(2.dp, LightPink)
+        ) {
+            Text(text = "Login")
+        }
+
+        // signup screen
+        Button(
+            onClick = {
+                navController?.navigate(Routes.Signup.route)
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (route == "Signup") LightPink else DarkBlue,
+                contentColor = if (route == "Signup") DarkBlue else LightPink
+            ),
+            shape = RoundedCornerShape(10.dp),
+            border = BorderStroke(2.dp, LightPink)
+        ) {
+            Text(text = "Sign Up")
         }
     }
 }

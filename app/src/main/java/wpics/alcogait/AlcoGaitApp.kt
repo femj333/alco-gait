@@ -31,7 +31,7 @@ class AlcoGaitApp : Application() {
 
         container = AppContainer(this, database)
 
-        /* insert dummy users into database */
+        /* insert dummy users into database
         if (isNewDatabase) {
             CoroutineScope(Dispatchers.IO).launch {
                 container.walkRepository.insertUser(
@@ -40,7 +40,8 @@ class AlcoGaitApp : Application() {
                         firstName = "Fem",
                         lastName = "Jansen",
                         email = "fejansen@wpi.edu",
-                        phoneNumber = "860-543-4206"
+                        phoneNumber = "860-543-4206",
+
                     )
                 )
                 container.walkRepository.insertUser(
@@ -54,5 +55,7 @@ class AlcoGaitApp : Application() {
                 )
             }
         }
+
+         */
     }
 }

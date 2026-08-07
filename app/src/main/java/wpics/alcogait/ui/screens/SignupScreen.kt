@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -22,9 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import wpics.alcogait.Routes
 import wpics.alcogait.data.User
 import wpics.alcogait.ui.components.LoginSignupHeader
@@ -35,12 +31,16 @@ import wpics.alcogait.viewmodels.HomeUiState
 import wpics.alcogait.viewmodels.HomeViewModel
 
 @Composable
-fun LoginScreen(
-    padding: PaddingValues,
+fun SignupScreen(
     viewModel: HomeViewModel,
     navController: NavHostController,
-    uiState: HomeUiState
+    uiState: HomeUiState,
+    padding: PaddingValues
 ) {
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var phoneNumber by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -51,17 +51,45 @@ fun LoginScreen(
         onClick = {
             val passwordChars = password.toCharArray()
 
-            viewModel.loginUser(
+            viewModel.registerUser(
                 username,
-                passwordChars
+                passwordChars,
+                firstName,
+                lastName,
+                email,
+                phoneNumber
             )
 
             // clear password
             passwordChars.fill('\u0000')
             password = ""
         },
-        buttonText = "Login"
+        buttonText = "Sign Up",
     ) {
+        LoginSignupTextField(
+            value = firstName,
+            onValueChange = { newText -> firstName = newText },
+            label = "First name"
+        )
+
+        LoginSignupTextField(
+            value = lastName,
+            onValueChange = { newText -> lastName = newText },
+            label = "Last name"
+        )
+
+        LoginSignupTextField(
+            value = email,
+            onValueChange = { newText -> email = newText },
+            label = "Email"
+        )
+
+        LoginSignupTextField(
+            value = phoneNumber,
+            onValueChange = { newText -> phoneNumber = newText },
+            label = "Phone number"
+        )
+
         LoginSignupTextField(
             value = username,
             onValueChange = { newText -> username = newText },
