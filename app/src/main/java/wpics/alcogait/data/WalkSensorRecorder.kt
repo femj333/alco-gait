@@ -84,9 +84,6 @@ class WalkSensorRecorder(context: Context) : SensorEventListener {
      * @param sensorEvent the new sensor reading
      */
     override fun onSensorChanged(sensorEvent: SensorEvent) {
-        if (sensorEvent.sensor.type == Sensor.TYPE_GYROSCOPE) {
-            Log.d("WalkSensorRecorded", "gyro accuracy = ${sensorEvent.accuracy}")
-        }
         // values returned by this sensor cannot be trusted
         if (sensorEvent.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE) return
 

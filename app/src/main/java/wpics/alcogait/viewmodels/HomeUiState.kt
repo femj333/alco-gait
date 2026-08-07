@@ -15,4 +15,5 @@ data class HomeUiState(
     val saveError: Boolean = false,
     val showMinRecordingAlert: Boolean = false,
     val elapsedMillis: Long = 0L,
+    val errorMessage: String? = null
 )

@@ -117,7 +117,7 @@ fun MainScreen(
                     }
 
                     composable(Routes.Location.route) {
-                        LocationScreen(padding, locationUiState, homeUiState, locationViewModel)
+                        LocationScreen(padding, locationUiState, homeUiState, locationViewModel, homeViewModel)
                     }
 
                     composable(Routes.Rideshare.route) {
@@ -125,7 +125,11 @@ fun MainScreen(
                     }
 
                     composable(Routes.Login.route) {
-                        LoginScreen(padding, homeViewModel, navController)
+                        LoginScreen(padding, homeViewModel, navController, homeUiState)
+                    }
+
+                    composable(Routes.Signup.route) {
+                        SignupScreen(homeViewModel, navController, homeUiState, padding)
                     }
                 }
             }

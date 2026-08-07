@@ -2,6 +2,7 @@ package wpics.alcogait.viewmodels
 
 import android.app.Application
 import android.location.Location
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -183,6 +184,11 @@ class HomeViewModel(
             }
 
             if (success) {
+                if (uiState.value.currentUser != null) {
+                    Log.d("HomeViewModel", "User ID: ${uiState.value.currentUser?.userId}")
+                } else {
+                    Log.d("HomeViewModel", "User ID: null")
+                }
                 val userId = uiState.value.currentUser?.userId ?: 0
 
                 // save in database
@@ -215,13 +221,59 @@ class HomeViewModel(
         super.onCleared()
     }
 
-    fun insertUser(user: User) {
+    fun registerUser(
+        username: String,
+        password: CharArray,
+        firstName: String,
+        lastName: String,
+        email: String,
+        phoneNumber: String
+    ) {
         viewModelScope.launch {
-            val newUserId = walkRepository.insertUser(user)
+            val user = walkRepository.register(username, password, firstName, lastName, email, phoneNumber)
             _uiState.update {
-                it.copy(currentUser = walkRepository.getUserById(newUserId))
+                it.copy(currentUser = user)
+            }
+
+            if (user == null) {
+                _uiState.update {
+                    it.copy(errorMessage = "Username already exists")
+                }
+            } else {
+                _uiState.update {
+                    it.copy(errorMessage = null)
+                }
             }
         }
     }
 
+    fun loginUser(
+        username: String,
+        password: CharArray
+    ) {
+        viewModelScope.launch {
+            val user = walkRepository.login(username, password)
+            _uiState.update {
+                it.copy(currentUser = user)
+            }
+
+            if (user == null) {
+                _uiState.update {
+                    it.copy(errorMessage = "Incorrect username or password")
+                }
+            } else {
+                _uiState.update {
+                    it.copy(errorMessage = null)
+                }
+            }
+        }
+    }
+
+    fun getDrinksByUserId(userId: Long) {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(drinksList = walkRepository.getDrinksByUserId(userId))
+            }
+        }
+    }
 }
