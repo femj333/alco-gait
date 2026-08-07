@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,6 +52,7 @@ import wpics.alcogait.R
 import wpics.alcogait.data.Drinks
 import wpics.alcogait.ui.theme.DarkBlue
 import wpics.alcogait.ui.theme.LightPink
+import wpics.alcogait.util.formatAsReadableDate
 import wpics.alcogait.viewmodels.HomeUiState
 import wpics.alcogait.viewmodels.HomeViewModel
 import wpics.alcogait.viewmodels.LocationUiState
@@ -212,6 +214,7 @@ fun LocationPopUp(
         Column(
             modifier = Modifier
         ) {
+            // address
             if (address != null) {
                 Text(
                     text = address,
@@ -229,11 +232,14 @@ fun LocationPopUp(
             Text(
                 text = "History",
                 color = Color.Black,
+                modifier = Modifier.padding(top = 20.dp)
             )
 
             timeAndPlaceOfDrinks?.forEach { drink ->
+                val date = formatAsReadableDate(drink.first)
+                val drunkState = drink.second?.lowercase()?.replaceFirstChar { it.titlecase() }
                 Text(
-                    text = "${drink.first}: ${drink.second}",
+                    text = "$date: $drunkState",
                     color = DarkBlue
                 )
             }
