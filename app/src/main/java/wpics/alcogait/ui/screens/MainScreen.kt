@@ -68,7 +68,9 @@ fun MainScreen(
                 musicChecked = playMusic,
                 onMusicCheckedChange = { playMusic = it },
                 navController = navController,
-                uiState = homeUiState
+                uiState = homeUiState,
+                viewModel = homeViewModel,
+                onCloseMenu = { menuBarVisible = false }
             )
         }
 

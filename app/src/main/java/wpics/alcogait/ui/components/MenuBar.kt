@@ -28,11 +28,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import wpics.alcogait.R
 import wpics.alcogait.Routes
 import wpics.alcogait.ui.theme.DarkBlue
 import wpics.alcogait.ui.theme.LightPink
 import wpics.alcogait.viewmodels.HomeUiState
+import wpics.alcogait.viewmodels.HomeViewModel
 
 @Composable
 fun MenuBar(
@@ -41,7 +43,9 @@ fun MenuBar(
     musicChecked: Boolean,
     onMusicCheckedChange: (Boolean) -> Unit,
     navController: NavController,
-    uiState: HomeUiState
+    uiState: HomeUiState,
+    viewModel: HomeViewModel,
+    onCloseMenu: () -> Unit
 ){
     Column(
         modifier = Modifier
@@ -54,7 +58,10 @@ fun MenuBar(
     ) {
         // profile header
         ProfileHeader(
-            onClick = { navController.navigate(Routes.Profile.route) },
+            onClick = {
+                navController.navigate(Routes.Profile.route)
+                onCloseMenu()
+            },
             uiState = uiState
         )
 
@@ -69,28 +76,40 @@ fun MenuBar(
         NavigateItem(
             destination = "Home",
             icon = R.drawable.home_icon,
-            onClick = { navController.navigate(Routes.Home.route) }
+            onClick = {
+                navController.navigate(Routes.Home.route)
+                onCloseMenu()
+            }
         )
 
         // navigate to location screen
         NavigateItem(
             destination = "Location",
             icon = R.drawable.location_icon,
-            onClick = { navController.navigate(Routes.Location.route) }
+            onClick = {
+                navController.navigate(Routes.Location.route)
+                onCloseMenu()
+            }
         )
 
         // navigate to time screen
         NavigateItem(
             destination = "Time",
             icon = R.drawable.time_icon,
-            onClick = { navController.navigate(Routes.Time.route) }
+            onClick = {
+                navController.navigate(Routes.Time.route)
+                onCloseMenu()
+            }
         )
 
         // navigate to rideshare screen
         NavigateItem(
             destination = "Rideshare",
             icon = R.drawable.rideshare_icon,
-            onClick = { navController.navigate(Routes.Rideshare.route) }
+            onClick = {
+                navController.navigate(Routes.Rideshare.route)
+                onCloseMenu()
+            }
         )
 
         // toggle display character
@@ -106,9 +125,45 @@ fun MenuBar(
             onCheckedChange = onMusicCheckedChange,
             text = "Music"
         )
+    }
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .navigationBarsPadding(),
+        verticalArrangement = Arrangement.Bottom,
+    ) {
         // alcogait logo(?)
         AlcoGaitLogo()
+
+        // logout button
+        LogoutButton(navController, viewModel, onCloseMenu)
+
+    }
+}
+
+@Composable
+fun LogoutButton(
+    navController: NavController,
+    viewModel: HomeViewModel,
+    onCloseMenu: () -> Unit
+) {
+    Button(
+        onClick = {
+            viewModel.logoutUser()
+            navController.navigate(Routes.Login.route)
+            onCloseMenu()
+        },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Black,
+            contentColor = Color.Red
+        ),
+        contentPadding = PaddingValues(start = 5.dp, top = 0.dp, end = 0.dp, bottom = 0.dp)
+    ) {
+        Text(
+            text = "Logout",
+            fontSize = 20.sp
+        )
     }
 }
 
@@ -229,27 +284,22 @@ fun Toggle(
 
 @Composable
 fun AlcoGaitLogo() {
-    Box(modifier = Modifier
-        .fillMaxSize()
+    Row(
+        modifier = Modifier
+            .padding(start = 10.dp, bottom = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Row(
+        Box(
             modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(start = 10.dp, bottom = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(color = LightPink, shape = CircleShape)
-            )
+                .size(40.dp)
+                .background(color = LightPink, shape = CircleShape)
+        )
 
-            Text(
-                text = "AlcoGait",
-                color = LightPink,
-                fontSize = 25.sp,
-            )
-        }
+        Text(
+            text = "AlcoGait",
+            color = LightPink,
+            fontSize = 25.sp,
+        )
     }
 }

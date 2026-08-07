@@ -277,4 +277,12 @@ class HomeViewModel(
             }
         }
     }
+
+    fun logoutUser() {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(currentUser = null)
+            }
+        }
+    }
 }
