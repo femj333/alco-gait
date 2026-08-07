@@ -54,6 +54,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.ui)
+    implementation(libs.androidx.compose.material3.lint)
     val room_version = "3.0.1"
     implementation("androidx.room3:room3-runtime:$room_version")
     ksp("androidx.room3:room3-compiler:$room_version")
@@ -65,6 +66,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation("androidx.compose.material:material-icons-extended:1.7.0")
     implementation("com.google.accompanist:accompanist-drawablepainter:0.37.3")
     implementation("com.opencsv:opencsv:4.0")
     implementation(libs.androidx.compose.foundation.layout)

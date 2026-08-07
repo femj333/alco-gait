@@ -29,6 +29,7 @@ import wpics.alcogait.Routes
 import wpics.alcogait.data.User
 import wpics.alcogait.ui.components.LoginSignupHeader
 import wpics.alcogait.ui.components.LoginSignupTextField
+import wpics.alcogait.ui.components.PasswordTextField
 import wpics.alcogait.ui.theme.DarkBlue
 import wpics.alcogait.viewmodels.HomeUiState
 import wpics.alcogait.viewmodels.HomeViewModel
@@ -67,10 +68,9 @@ fun LoginScreen(
             label = "Username"
         )
 
-        LoginSignupTextField(
+        PasswordTextField(
             value = password,
-            onValueChange = { newText -> password = newText },
-            label = "Password"
+            onValueChange = { newText -> password = newText }
         )
     }
 }
