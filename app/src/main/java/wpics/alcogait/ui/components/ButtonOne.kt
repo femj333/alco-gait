@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,6 +28,8 @@ fun ButtonOne(
     roundedCornerSize: Int = 50,
     width: Int,
     height: Int,
+    contentAlignment: Alignment = Alignment.TopCenter,
+    offset: Int = 0,
     content: @Composable () -> Unit
 ) {
     Box(
@@ -61,8 +64,9 @@ fun ButtonOne(
                     offset = DpOffset(x = 0.dp, (-3).dp)
                 )
             )
-            .padding(contentPadding),
-        contentAlignment = Alignment.TopCenter
+            .padding(contentPadding)
+            .offset(y = offset.dp),
+        contentAlignment = contentAlignment
     ){
         content()
     }
