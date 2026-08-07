@@ -22,6 +22,8 @@ class MainActivity : ComponentActivity() {
         if (!granted) {
             // permission denied
             Log.d("MainActivity", "Location permission denied")
+        } else {
+            Log.d("MainActivity", "Location permission granted")
         }
     }
 

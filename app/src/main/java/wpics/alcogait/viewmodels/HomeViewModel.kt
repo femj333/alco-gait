@@ -89,6 +89,7 @@ class HomeViewModel(
 
         viewModelScope.launch {
             recordingLocation = locationHelper.getCurrentLocation()
+            Log.d("HomeViewModel", "Location: ${recordingLocation?.latitude}, Longitude: ${recordingLocation?.longitude}")
         }
 
         completedWindows = 0

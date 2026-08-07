@@ -112,9 +112,9 @@ fun DrinkLocationMap(
     var selectedDrink by remember { mutableStateOf<Drinks?>(null) }
 
     // initial camera positioning
-    val firstDrinkLatLng = LatLng(drinksList.first().latitude.toDouble(), drinksList.first().longitude.toDouble())
+    val recentDrinkLatLng = LatLng(drinksList.last().latitude.toDouble(), drinksList.last().longitude.toDouble())
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(firstDrinkLatLng, 15f)
+        position = CameraPosition.fromLatLngZoom(recentDrinkLatLng, 15f)
     }
 
     Box(
