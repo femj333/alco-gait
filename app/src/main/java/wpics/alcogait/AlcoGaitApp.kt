@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.room3.Room
 import androidx.room3.RoomDatabase
 import androidx.sqlite.SQLiteConnection
+import com.google.android.libraries.places.api.Places
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,14 +19,18 @@ class AlcoGaitApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        var isNewDatabase = false
+         //var isNewDatabase = false
+
+        if (!Places.isInitialized()) {
+            Places.initialize(applicationContext, BuildConfig.PLACES_API_KEY)
+        }
 
         database = Room.databaseBuilder(this, AppDatabase::class.java, "alcogait_db")
             .fallbackToDestructiveMigration(dropAllTables = true)
             .addCallback(object : RoomDatabase.Callback() {
                 override suspend fun onCreate(connection: SQLiteConnection) {
                     super.onCreate(connection)
-                    isNewDatabase = true
+                    // isNewDatabase = true
             }
         }).build()
 

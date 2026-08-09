@@ -1,11 +1,11 @@
 package wpics.alcogait.viewmodels
 
-import wpics.alcogait.data.Drinks
-import wpics.alcogait.data.User
+import com.google.android.libraries.places.api.model.Place
 
 data class LocationUiState(
     val numDrinksAtLocation: HashMap<Pair<Float, Float>, Int>? = null,
     val timeAndPlaceOfDrinks: List<Pair<String, String?>>? = null,
+    val placesSearchList: List<Place> = emptyList(),
     val address: String? = null,
     val latitude: Float? = null,
     val longitude: Float? = null,

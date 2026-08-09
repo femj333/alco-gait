@@ -31,6 +31,12 @@ android {
             "GEOCODING_API_KEY",
             "\"${project.findProperty("GEOCODING_API_KEY") ?: ""}\""
         )
+
+        buildConfigField(
+            "String",
+            "PLACES_API_KEY",
+            "\"${project.findProperty("PLACES_API_KEY") ?: ""}\""
+        )
     }
 
     buildTypes {
@@ -53,6 +59,12 @@ android {
 }
 
 dependencies {
+    implementation("com.google.android.libraries.places:places:3.5.0") {
+        exclude(group = "androidx.vectordrawable", module = "vectordrawable")
+        exclude(group = "androidx.vectordrawable", module = "vectordrawable-animated")
+    }
+    implementation("androidx.vectordrawable:vectordrawable:1.2.0")
+    implementation("androidx.vectordrawable:vectordrawable-animated:1.2.0")
     implementation(libs.androidx.ui)
     implementation(libs.androidx.compose.material3.lint)
     val room_version = "3.0.1"
