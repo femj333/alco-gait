@@ -1,15 +1,24 @@
 package wpics.alcogait.viewmodels
 
+import android.Manifest
 import android.app.Application
+import android.app.PendingIntent
+import android.content.Intent
 import android.location.Location
 import android.util.Log
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.google.android.gms.location.ActivityRecognition
+import com.google.android.gms.location.ActivityTransition
+import com.google.android.gms.location.ActivityTransitionRequest
+import com.google.android.gms.location.DetectedActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -29,10 +38,14 @@ import wpics.alcogait.data.Walk
 import wpics.alcogait.data.WalkCSVWriter
 import wpics.alcogait.data.WalkRepository
 import wpics.alcogait.data.WalkSensorRecorder
+import wpics.alcogait.data.WalkTrackingEvent
+import wpics.alcogait.data.WalkTrackingEvents
 import wpics.alcogait.models.DrunkState
+import wpics.alcogait.receivers.ActivityTransitionReceiver
 import java.io.File
 import java.time.Instant
 import kotlin.Boolean
+import kotlin.jvm.java
 
 class HomeViewModel(
     application: Application,
@@ -71,6 +84,16 @@ class HomeViewModel(
     private var locationHelper = LocationHelper(application)
     private var recordingLocation: Location? = null
 
+    private val myPendingIntent: PendingIntent by lazy {
+        val intent = Intent(getApplication(), ActivityTransitionReceiver::class.java)
+        PendingIntent.getBroadcast(
+            getApplication(),
+            0,
+            intent,
+            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+    }
+
     private val rootFolder = File(
         application.getExternalFilesDir(null), "AlcoGait/session_${System.currentTimeMillis()}"
     ).apply { mkdirs() }
@@ -81,6 +104,17 @@ class HomeViewModel(
             val y = data[2].toFloatOrNull()
             val z = data[3].toFloatOrNull()
             if (x!= null && y!= null && z!= null) analyzer.addSample(x, y, z)
+        }
+
+        viewModelScope.launch {
+            WalkTrackingEvents.events.collect { event ->
+                when (event) {
+                    WalkTrackingEvent.STARTED_WALKING ->
+                        if (!uiState.value.isRecording) onStartClicked()
+                    WalkTrackingEvent.STOPPED_WALKING ->
+                        if (uiState.value.isRecording) onStopClicked()
+                }
+            }
         }
 
     }
@@ -322,5 +356,35 @@ class HomeViewModel(
                 )
             }
         }
+    }
+
+    @RequiresPermission(Manifest.permission.ACTIVITY_RECOGNITION)
+    fun startWalkTracking() {
+        val transitions = mutableListOf<ActivityTransition>()
+
+        // transition for when user starts walking
+        transitions +=
+            ActivityTransition.Builder()
+                .setActivityType(DetectedActivity.WALKING)
+                .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
+                .build()
+
+        // transition for when user stops walking
+        transitions +=
+            ActivityTransition.Builder()
+                .setActivityType(DetectedActivity.WALKING)
+                .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_EXIT)
+                .build()
+
+        // register activity for transition updates
+        val request = ActivityTransitionRequest(transitions)
+        ActivityRecognition.getClient(getApplication())
+            .requestActivityTransitionUpdates(request, myPendingIntent)
+            .addOnSuccessListener {
+                Log.d("HomeViewModel", "Activity transition updates registered")
+            }
+            .addOnFailureListener {e: Exception ->
+                Log.e("HomeViewModel", "Activity transition updates failed",e)
+            }
     }
 }

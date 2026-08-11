@@ -1,5 +1,8 @@
 package wpics.alcogait.ui.screens
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +23,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +39,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getDrawable
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import wpics.alcogait.R
@@ -53,6 +58,7 @@ fun formatElapsed(millis: Long): String {
     return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
 }
 
+@SuppressLint("MissingPermission")
 @Composable
 fun HomeScreen(
     displayCharacter: Boolean,
@@ -60,6 +66,18 @@ fun HomeScreen(
     uiState: HomeUiState,
     viewModel: HomeViewModel
 ) {
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        val hasPermission = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACTIVITY_RECOGNITION
+        ) == PackageManager.PERMISSION_GRANTED
+        // track walking
+        if (hasPermission) {
+            viewModel.startWalkTracking()
+        }
+    }
+
     if (displayCharacter) {
         CharacterHomeScreen(uiState, viewModel, padding)
     } else {
