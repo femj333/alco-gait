@@ -231,7 +231,14 @@ class HomeViewModel(
         phoneNumber: String
     ) {
         viewModelScope.launch {
-            val user = walkRepository.register(username, password, firstName, lastName, email, phoneNumber)
+            val user = walkRepository.register(
+                username,
+                password,
+                firstName,
+                lastName,
+                email,
+                phoneNumber
+            )
             _uiState.update {
                 it.copy(currentUser = user)
             }

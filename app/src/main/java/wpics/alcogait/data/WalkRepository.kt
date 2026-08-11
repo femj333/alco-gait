@@ -63,8 +63,10 @@ class WalkRepository(
             email = email,
             phoneNumber = phoneNumber
         )
-        userDao.insertUser(user)
-        return user
+        val generatedUserId = userDao.insertUser(user)
+        val savedUser = user.copy(userId = generatedUserId)
+
+        return savedUser
     }
 
     /**

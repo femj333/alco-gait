@@ -30,7 +30,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
@@ -68,8 +67,15 @@ import wpics.alcogait.viewmodels.LocationUiState
 import wpics.alcogait.viewmodels.LocationViewModel
 import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
 import coil3.compose.AsyncImage
 import wpics.alcogait.ui.theme.LightGray
 
@@ -257,74 +263,45 @@ fun LocationPopUp(
     val address = locationUiState.address
 
     Box(
-        modifier = Modifier
-            .size(320.dp, height = 300.dp)
-            .dropShadow(
-                shape = RoundedCornerShape(20.dp),
-                shadow = Shadow(
-                    radius = 4.dp,
-                    spread = 0.dp,
-                    color = Color.Black.copy(alpha = 0.4f),
-                    offset = DpOffset(x = 0.dp, y = 2.dp)
-                )
-            )
-            .dropShadow(
-                shape = RoundedCornerShape(20.dp),
-                shadow = Shadow(
-                    radius = 13.dp,
-                    spread = (-3).dp,
-                    color = Color.Black.copy(alpha = 0.3f),
-                    offset = DpOffset(x = 0.dp, y = 7.dp)
-                )
-            )
-            .clip(RoundedCornerShape(20.dp))
-            .background(Color.White)
-            .padding(20.dp)
+        modifier = Modifier.size(width = 360.dp, height = 170.dp)
     ) {
-
-        Row(
-            modifier = Modifier.fillMaxSize()
+        // popup body
+        Box(
+            modifier = Modifier
+                .size(350.dp, height = 160.dp)
+                .dropShadow(
+                    shape = RoundedCornerShape(20.dp),
+                    shadow = Shadow(
+                        radius = 4.dp,
+                        spread = 0.dp,
+                        color = Color.Black.copy(alpha = 0.4f),
+                        offset = DpOffset(x = 0.dp, y = 2.dp)
+                    )
+                )
+                .dropShadow(
+                    shape = RoundedCornerShape(20.dp),
+                    shadow = Shadow(
+                        radius = 13.dp,
+                        spread = (-3).dp,
+                        color = Color.Black.copy(alpha = 0.3f),
+                        offset = DpOffset(x = 0.dp, y = 7.dp)
+                    )
+                )
+                .clip(RoundedCornerShape(20.dp))
+                .background(Color.White)
+                .padding(20.dp)
         ) {
-            Column(
-                modifier = Modifier.weight(1f)
-
+            Row(
+                modifier = Modifier.fillMaxSize()
             ) {
-                Row(
-                    modifier = Modifier
-                ) {
-                    // close button
-                    Box(
-                        modifier = Modifier
-                            .size(30.dp)
-                            .clickable(onClick = onDismiss)
-                            .dropShadow(
-                                shape = CircleShape,
-                                shadow = Shadow(
-                                    radius = 4.dp,
-                                    spread = 0.dp,
-                                    color = Color.Black.copy(alpha = 0.4f),
-                                    offset = DpOffset(x = 0.dp, y = 2.dp)
-                                )
-                            )
-                            .dropShadow(
-                                shape = CircleShape,
-                                shadow = Shadow(
-                                    radius = 13.dp,
-                                    spread = (-3).dp,
-                                    color = Color.Black.copy(alpha = 0.3f),
-                                    offset = DpOffset(x = 0.dp, y = 7.dp)
-                                )
-                            )
-                            .clip(CircleShape)
-                            .background(Color.White, CircleShape),
-                    ) {
-                        Text("x", fontSize = 12.sp, color = LightGray)
-                    }
+                Column(
+                    modifier = Modifier.weight(1f)
 
-                    // address
+                ) {
+                    // address header
                     if (address != null) {
                         Text(
-                            text = address,
+                            text = address.substringBefore(","),
                             color = DarkBlue,
                         )
                     } else {
@@ -335,35 +312,74 @@ fun LocationPopUp(
                             )
                         }
                     }
+
+                    // location drinking history
+                    Text(
+                        text = "History",
+                        color = Color.Black,
+                        modifier = Modifier.padding(top = 20.dp)
+                    )
+
+                    timeAndPlaceOfDrinks?.takeLast(3)?.forEach { drink ->
+                        val date = formatAsReadableDate(drink.first)
+                        val drunkState =
+                            drink.second?.lowercase()?.replaceFirstChar { it.titlecase() }
+                        Text(
+                            text = "$date: $drunkState",
+                            color = DarkBlue
+                        )
+                    }
                 }
 
-
-                Text(
-                    text = "History",
-                    color = Color.Black,
-                    modifier = Modifier.padding(top = 20.dp)
-                )
-
-                timeAndPlaceOfDrinks?.takeLast(3)?.forEach { drink ->
-                    val date = formatAsReadableDate(drink.first)
-                    val drunkState = drink.second?.lowercase()?.replaceFirstChar { it.titlecase() }
-                    Text(
-                        text = "$date: $drunkState",
-                        color = DarkBlue
+                // image
+                locationUiState.placePhotoUri?.let { uri ->
+                    AsyncImage(
+                        model = uri,
+                        contentDescription = "Place photo",
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(10.dp))
                     )
                 }
             }
+        }
 
-            // image
-            locationUiState.placePhotoUri?.let { uri ->
-                AsyncImage(
-                    model = uri,
-                    contentDescription = "Place photo",
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(10.dp))
+        // close button
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .offset(x = (-10).dp, y = (-10).dp)
+                .size(30.dp)
+                .clickable(onClick = onDismiss)
+                .dropShadow(
+                    shape = CircleShape,
+                    shadow = Shadow(
+                        radius = 4.dp,
+                        spread = 0.dp,
+                        color = Color.Black.copy(alpha = 0.4f),
+                        offset = DpOffset(x = 0.dp, y = 2.dp)
+                    )
                 )
-            }
+                .dropShadow(
+                    shape = CircleShape,
+                    shadow = Shadow(
+                        radius = 13.dp,
+                        spread = (-3).dp,
+                        color = Color.Black.copy(alpha = 0.3f),
+                        offset = DpOffset(x = 0.dp, y = 7.dp)
+                    )
+                )
+                .clip(CircleShape)
+                .background(Color.White, CircleShape),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Close",
+                tint = LightGray,
+                modifier = Modifier
+                    .size(20.dp)
+                    .align(Alignment.Center)
+            )
         }
     }
 }
