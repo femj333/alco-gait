@@ -2,6 +2,7 @@ package wpics.alcogait.viewmodels
 
 import android.app.Application
 import android.location.Location
+import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
@@ -24,11 +25,17 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.SearchByTextRequest
 import com.google.android.libraries.places.api.net.SearchNearbyRequest
 import wpics.alcogait.BuildConfig
+import com.google.android.libraries.places.api.model.AuthorAttributions
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import wpics.alcogait.AlcoGaitApp
 import wpics.alcogait.data.LocationHelper
 
@@ -71,12 +78,15 @@ class LocationViewModel(
      */
     fun getAddressOrNameFromCoordinates(latitude: Float, longitude: Float) {
         viewModelScope.launch {
+            /*
             _uiState.update {
                 it.copy(
-                    isLoading = true,
+                    locationPopUpLoading = true,
                     errorMessage = null
                 )
             }
+
+             */
 
             try {
                 val response = RetrofitInstance.geocodingService.reverseGeocode(
@@ -103,7 +113,7 @@ class LocationViewModel(
                             _uiState.update {
                                 it.copy(
                                     displayName = response.place.name,
-                                    isLoading = false
+                                    /* locationPopUpLoading = false */
                                 )
                             }
                         }
@@ -111,7 +121,7 @@ class LocationViewModel(
                             _uiState.update {
                                 it.copy(
                                     errorMessage = e.message,
-                                    isLoading = false
+                                    /* locationPopUpLoading = false */
                                 )
                             }
                         }
@@ -119,7 +129,7 @@ class LocationViewModel(
                     _uiState.update {
                         it.copy(
                             errorMessage = "No address found",
-                            isLoading = false
+                            /* locationPopUpLoading = false */
                         )
                     }
                 }
@@ -127,7 +137,7 @@ class LocationViewModel(
                 _uiState.update {
                     it.copy(
                         errorMessage = e.message,
-                        isLoading = false
+                        /* locationPopUpLoading = false */
                     )
                 }
             }
@@ -145,7 +155,10 @@ class LocationViewModel(
         viewModelScope.launch {
             val numDrinks = walkRepository.getNumDrinksAtLocation(userId, latitude, longitude)
             _uiState.update {
-                it.copy(numDrinksAtLocation = hashMapOf(Pair(latitude, longitude) to numDrinks))
+                it.copy(
+                    numDrinksAtLocation =
+                        hashMapOf(Pair(latitude, longitude) to numDrinks)
+                )
             }
         }
     }
@@ -163,18 +176,28 @@ class LocationViewModel(
     }
 
     /**
-     * Gets the time and place of all logged drinking for a user at a location and updates the UI state
+     * Gets the date and drunk state of all logged drinking for a user at a location and updates the UI state
      *
      * @param userId the ID of the user
      * @param latitude the latitude of the location
      * @param longitude the longitude of the location
      */
-    fun getTimeAndPlaceOfDrinksAtLocation(userId: Long, latitude: Float, longitude: Float) {
+    fun getDateAndDrunkStateOfDrinksAtLocation(userId: Long, latitude: Float, longitude: Float) {
         viewModelScope.launch {
-            val timeAndPlaceOfDrinks =
-                walkRepository.getTimeAndPlaceOfDrinksAtLocation(userId, latitude, longitude)
             _uiState.update {
-                it.copy(timeAndPlaceOfDrinks = timeAndPlaceOfDrinks)
+                it.copy(
+                    /* locationPopUpLoading = true, */
+                    errorMessage = null
+                )
+            }
+
+            val dateAndStateOfDrinks =
+                walkRepository.getDateAndDrunkStateOfDrinksAtLocation(userId, latitude, longitude)
+            _uiState.update {
+                it.copy(
+                    dateAndStateOfDrinks = dateAndStateOfDrinks,
+                    /* locationPopUpLoading = false */
+                )
             }
         }
     }
@@ -307,7 +330,7 @@ class LocationViewModel(
     fun getPlaceImage(placeId: String) {
         _uiState.update {
             it.copy(
-                isLoading = true,
+                /* locationPopUpLoading = true, */
                 errorMessage = null
             )
         }
@@ -329,7 +352,7 @@ class LocationViewModel(
                             placePhotoUri = null,
                             placePhotoAttributions = null,
                             placePhotoAuthorAttributions = null,
-                            isLoading = false
+                            /* locationPopUpLoading = false */
                         )
                     }
                     return@addOnSuccessListener
@@ -353,7 +376,7 @@ class LocationViewModel(
                                 placePhotoUri = response.uri,
                                 placePhotoAttributions = attributions,
                                 placePhotoAuthorAttributions = authorAttributions,
-                                isLoading = false
+                                /* locationPopUpLoading = false */
                             )
                         }
                     }
@@ -362,10 +385,191 @@ class LocationViewModel(
                 Log.e("LocationViewModel", "Place not found", e)
                 _uiState.update {
                     it.copy(
-                        isLoading = false,
+                        /* locationPopUpLoading = false, */
                         errorMessage = e.message
                     )
                 }
             }
+    }
+
+    /**
+     * Loads the location popup for a user at a location and updates the UI state
+     *
+     * @param userId the ID of the user
+     * @param latitude the latitude of the location
+     * @param longitude the longitude of the location
+     */
+    fun loadLocationPopup(userId: Long, latitude: Float, longitude: Float) {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    locationPopUpLoading = true,
+                    errorMessage = null,
+                    address = null,
+                    displayName = null,
+                    dateAndStateOfDrinks = null,
+                    selectedMarkerPlaceId = null,
+                    placePhotoUri = null,
+                    placePhotoAttributions = null,
+                    placePhotoAuthorAttributions = null
+                )
+            }
+
+            try {
+                val popupData = loadLocationPopupData(userId, latitude, longitude)
+                _uiState.update {
+                    it.copy(
+                        dateAndStateOfDrinks = popupData.dateAndStateOfDrinks,
+                        address = popupData.address,
+                        displayName = popupData.displayName,
+                        selectedMarkerPlaceId = popupData.placeId,
+                        placePhotoUri = popupData.placePhotoUri,
+                        placePhotoAttributions = popupData.placePhotoAttributions,
+                        placePhotoAuthorAttributions = popupData.placePhotoAuthorAttributions,
+                        locationPopUpLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("LocationViewModel", "Error loading location popup", e)
+                _uiState.update {
+                    it.copy(
+                        errorMessage = e.message,
+                        locationPopUpLoading = false
+                    )
+                }
+            }
+        }
+    }
+
+    private data class LocationPopupData(
+        val dateAndStateOfDrinks: List<Pair<String, String?>>,
+        val address: String?,
+        val displayName: String?,
+        val placeId: String?,
+        val placePhotoUri: Uri?,
+        val placePhotoAttributions: String?,
+        val placePhotoAuthorAttributions: AuthorAttributions?
+    )
+
+    /**
+     * Loads the location popup data for a user at a location, waiting for all data to be loaded
+     *
+     * @param userId the ID of the user
+     * @param latitude the latitude of the location
+     * @param longitude the longitude of the location
+     */
+    private suspend fun loadLocationPopupData(
+        userId: Long,
+        latitude: Float,
+        longitude: Float
+    ): LocationPopupData = coroutineScope {
+        // wait for all data to be loaded
+        val drinksDeferred = async {
+            walkRepository.getDateAndDrunkStateOfDrinksAtLocation(userId, latitude, longitude)
+        }
+        val geocodeDeferred = async {
+            RetrofitInstance.geocodingService.reverseGeocode(
+                latlng = "$latitude,$longitude",
+                apiKey = BuildConfig.GEOCODING_API_KEY
+            )
+        }
+
+        val dateAndStateOfDrinks = drinksDeferred.await()
+        val geocodeResponse = geocodeDeferred.await()
+        Log.d("Geocoding", "Status=${geocodeResponse.status}, results=${geocodeResponse.results}")
+
+        val result = geocodeResponse.results.firstOrNull()
+        val address = result?.formatted_address
+        val placeId = result?.place_id
+        val displayName = placeId?.let { fetchPlaceName(it) }
+        val placePhoto = placeId?.let { fetchPlacePhoto(it) }
+
+        LocationPopupData(
+            dateAndStateOfDrinks = dateAndStateOfDrinks,
+            address = address,
+            displayName = displayName,
+            placeId = placeId,
+            placePhotoUri = placePhoto?.uri,
+            placePhotoAttributions = placePhoto?.attributions,
+            placePhotoAuthorAttributions = placePhoto?.authorAttributions
+        )
+    }
+
+    /**
+     * Gets the name of a place from its ID
+     *
+     * @param placeId the ID of the place
+     */
+    private suspend fun fetchPlaceName(placeId: String): String? = try {
+        val placeFields = listOf(Place.Field.NAME)
+
+        suspendCancellableCoroutine { continuation ->
+            val request = FetchPlaceRequest
+                .builder(placeId, placeFields)
+                .build()
+            placesClient.fetchPlace(request)
+                .addOnSuccessListener { response ->
+                    continuation.resume(response.place.name)
+                }
+                .addOnFailureListener { error ->
+                    continuation.resumeWithException(error)
+                }
+        }
+    } catch (e: Exception) {
+        Log.w("LocationViewModel", "Unable to fetch place name", e)
+        null
+    }
+
+    private data class PlacePhotoResult(
+        val uri: Uri?,
+        val attributions: String?,
+        val authorAttributions: AuthorAttributions?
+    )
+
+    /**
+     * Gets the photo of a place from its ID
+     *
+     * @param placeId the ID of the place
+     */
+    private suspend fun fetchPlacePhoto(placeId: String): PlacePhotoResult? = try {
+        val placeFields = listOf(Place.Field.PHOTO_METADATAS)
+        val placeResponse = suspendCancellableCoroutine { continuation ->
+            val request = FetchPlaceRequest
+                .builder(placeId, placeFields)
+                .build()
+            placesClient.fetchPlace(request)
+                .addOnSuccessListener { response ->
+                    continuation.resume(response)
+                }
+                .addOnFailureListener { error ->
+                    continuation.resumeWithException(error)
+                }
+        }
+
+        val photoMetadata = placeResponse.place.photoMetadatas?.firstOrNull()
+            ?: return PlacePhotoResult(null, null, null)
+
+        val photoResponse = suspendCancellableCoroutine { continuation ->
+            val request = FetchResolvedPhotoUriRequest.builder(photoMetadata)
+                .setMaxWidth(500)
+                .setMaxHeight(300)
+                .build()
+            placesClient.fetchResolvedPhotoUri(request)
+                .addOnSuccessListener { response ->
+                    continuation.resume(response)
+                }
+                .addOnFailureListener { error ->
+                    continuation.resumeWithException(error)
+                }
+        }
+
+        PlacePhotoResult(
+            uri = photoResponse.uri,
+            attributions = photoMetadata.attributions,
+            authorAttributions = photoMetadata.authorAttributions
+        )
+    } catch (e: Exception) {
+        Log.w("LocationViewModel", "Unable to fetch place photo", e)
+        null
     }
 }
