@@ -9,16 +9,17 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.location.LocationServices
+import wpics.alcogait.data.WalkRepository
 import wpics.alcogait.ui.theme.AlcoGaitTheme
 import wpics.alcogait.ui.screens.MainScreen
 
 class MainActivity : ComponentActivity() {
-
     // request location permissions
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        val granted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        val granted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true &&
+                permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
         if (!granted) {
             // permission denied
             Log.d("MainActivity", "Location permission denied")
@@ -31,7 +32,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        locationPermissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION))
+        locationPermissionLauncher.launch(arrayOf(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ))
 
         setContent {
             AlcoGaitTheme {

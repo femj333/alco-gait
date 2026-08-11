@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -39,6 +40,13 @@ fun LoginSignupTextField(
             focusedTextColor = DarkBlue,
             unfocusedTextColor = DarkBlue,
             cursorColor = DarkBlue,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            focusedLabelColor = DarkBlue,
+            unfocusedLabelColor = DarkBlue,
+            focusedPlaceholderColor = DarkBlue,
+            unfocusedPlaceholderColor = DarkBlue,
         )
     )
 }
@@ -61,6 +69,13 @@ fun PasswordTextField(
             focusedTextColor = DarkBlue,
             unfocusedTextColor = DarkBlue,
             cursorColor = DarkBlue,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            focusedLabelColor = DarkBlue,
+            unfocusedLabelColor = DarkBlue,
+            focusedPlaceholderColor = DarkBlue,
+            unfocusedPlaceholderColor = DarkBlue,
         ),
         visualTransformation = if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
