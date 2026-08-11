@@ -274,7 +274,7 @@ fun LocationPopUp(
             drink.latitude,
             drink.longitude
         )
-        locationViewModel.getAddressFromCoordinates(
+        locationViewModel.getAddressOrNameFromCoordinates(
             drink.latitude,
             drink.longitude
         )
@@ -282,6 +282,7 @@ fun LocationPopUp(
 
     val timeAndPlaceOfDrinks = locationUiState.timeAndPlaceOfDrinks
     val address = locationUiState.address
+    val displayName = locationUiState.displayName
 
     Box(
         modifier = Modifier.size(width = 360.dp, height = 170.dp)
@@ -320,23 +321,21 @@ fun LocationPopUp(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    // address header
-                    if (address != null) {
+                    // try for display name header first, fallback to address
+                    if (displayName != null) {
+                        Text(
+                            text = displayName,
+                            color = DarkBlue,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    } else if (address != null) {
                         Text(
                             text = address.substringBefore(","),
                             color = DarkBlue,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.SemiBold
                         )
-                    } else {
-                        locationUiState.errorMessage?.let {
-                            Text(
-                                text = it,
-                                color = DarkBlue,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
                     }
 
                     HorizontalDivider(

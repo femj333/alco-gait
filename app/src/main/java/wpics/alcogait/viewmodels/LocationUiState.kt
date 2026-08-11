@@ -15,6 +15,7 @@ data class LocationUiState(
     val placePhotoAttributions: String? = null,
     val placePhotoAuthorAttributions: AuthorAttributions? = null,
     val address: String? = null,
+    val displayName: String? = null,
     val latitude: Float? = null,
     val longitude: Float? = null,
     val isLoading: Boolean = false,

@@ -64,12 +64,12 @@ class LocationViewModel(
     private var recordingLocation: Location? = null
 
     /**
-     * Gets the address from the given coordinates and updates the UI state
+     * Gets the address or display name from the given coordinates and updates the UI state
      *
      * @param latitude the latitude of the coordinates
      * @param longitude the longitude of the coordinates
      */
-    fun getAddressFromCoordinates(latitude: Float, longitude: Float) {
+    fun getAddressOrNameFromCoordinates(latitude: Float, longitude: Float) {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
@@ -85,15 +85,36 @@ class LocationViewModel(
                 )
                 Log.d("Geocoding", "Status=${response.status}, results=${response.results}")
 
+                // store address and place id of response
                 val result = response.results.firstOrNull()
                 if (result != null) {
                     _uiState.update {
                         it.copy(
                             address = result.formatted_address,
-                            selectedMarkerPlaceId = result.place_id,
-                            isLoading = false
+                            selectedMarkerPlaceId = result.place_id
                         )
                     }
+
+                    // get place name
+                    val placeFields = listOf(Place.Field.NAME)
+                    val request = FetchPlaceRequest.builder(result.place_id, placeFields).build()
+                    placesClient.fetchPlace(request)
+                        .addOnSuccessListener { response ->
+                            _uiState.update {
+                                it.copy(
+                                    displayName = response.place.name,
+                                    isLoading = false
+                                )
+                            }
+                        }
+                        .addOnFailureListener { e ->
+                            _uiState.update {
+                                it.copy(
+                                    errorMessage = e.message,
+                                    isLoading = false
+                                )
+                            }
+                        }
                 } else {
                     _uiState.update {
                         it.copy(
