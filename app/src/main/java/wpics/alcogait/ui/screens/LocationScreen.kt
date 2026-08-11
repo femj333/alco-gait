@@ -285,12 +285,12 @@ fun LocationPopUp(
     val displayName = locationUiState.displayName
 
     Box(
-        modifier = Modifier.size(width = 360.dp, height = 170.dp)
+        modifier = Modifier.size(width = 360.dp, height = 190.dp)
     ) {
         // popup body
         Box(
             modifier = Modifier
-                .size(350.dp, height = 160.dp)
+                .size(350.dp, height = 180.dp)
                 .dropShadow(
                     shape = RoundedCornerShape(20.dp),
                     shadow = Shadow(
@@ -319,7 +319,7 @@ fun LocationPopUp(
             ) {
                 Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     // try for display name header first, fallback to address
                     if (displayName != null) {
@@ -339,7 +339,7 @@ fun LocationPopUp(
                     }
 
                     HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 8.dp),
+                        modifier = Modifier.padding(vertical = 4.dp),
                         thickness = 1.dp,
                         color = LightGray.copy(alpha = 0.4f)
                     )
@@ -353,7 +353,6 @@ fun LocationPopUp(
                     )
 
                     Column(
-                        modifier = Modifier.padding(top = 1.dp),
                         verticalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
                         if (timeAndPlaceOfDrinks.isNullOrEmpty()) {
