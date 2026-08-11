@@ -29,8 +29,10 @@ import wpics.alcogait.data.Walk
 import wpics.alcogait.data.WalkCSVWriter
 import wpics.alcogait.data.WalkRepository
 import wpics.alcogait.data.WalkSensorRecorder
+import wpics.alcogait.models.DrunkState
 import java.io.File
 import java.time.Instant
+import kotlin.Boolean
 
 class HomeViewModel(
     application: Application,
@@ -288,7 +290,36 @@ class HomeViewModel(
     fun logoutUser() {
         viewModelScope.launch {
             _uiState.update {
-                it.copy(currentUser = null)
+                it.copy(
+                    currentUser = null,
+                    isRecording = false,
+                    drunkState = DrunkState(),
+                    currentWalk = null,
+                    drinksList = null,
+                    saveError= false,
+                    showMinRecordingAlert = false,
+                    elapsedMillis= 0L,
+                    locationScreenLoading = false,
+                    errorMessage= null
+                )
+            }
+        }
+    }
+
+    fun loadLocationScreen(userId: Long) {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    locationScreenLoading = true
+                )
+            }
+
+            getDrinksByUserId(userId)
+
+            _uiState.update {
+                it.copy(
+                    locationScreenLoading = false
+                )
             }
         }
     }

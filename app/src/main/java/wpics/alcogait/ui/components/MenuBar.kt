@@ -87,6 +87,7 @@ fun MenuBar(
             destination = "Location",
             icon = R.drawable.location_icon,
             onClick = {
+                uiState.currentUser?.userId?.let { viewModel.loadLocationScreen(it) }
                 navController.navigate(Routes.Location.route)
                 onCloseMenu()
             }

@@ -175,6 +175,8 @@ fun DrinkLocationMap(
     cameraPositionState: CameraPositionState
 ) {
     var selectedDrink by remember { mutableStateOf<Drinks?>(null) }
+    var isMapLoaded by remember { mutableStateOf(false) }
+    val showLoading = homeUiState.locationScreenLoading || !isMapLoaded
 
     // initially center camera on most recently logged drink
     LaunchedEffect(Unit) {
@@ -203,8 +205,10 @@ fun DrinkLocationMap(
 
     Box(
         modifier = Modifier
+            .fillMaxSize()
     ) {
         GoogleMap(
+            onMapLoaded = { isMapLoaded = true },
             modifier = Modifier
                 .fillMaxSize(),
             cameraPositionState = cameraPositionState
@@ -249,6 +253,20 @@ fun DrinkLocationMap(
                     drink = drink,
                     locationUiState = locationUiState,
                     onDismiss = { selectedDrink = null }
+                )
+            }
+        }
+
+        if (showLoading) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(DarkBlue)
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = LightPink,
+                    trackColor = LightGray
                 )
             }
         }
