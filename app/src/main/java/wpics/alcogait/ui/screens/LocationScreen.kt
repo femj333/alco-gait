@@ -126,17 +126,6 @@ fun LocationScreen(
         }
     }
 
-    /*
-    // get the place's image each time a new marker is selected
-    LaunchedEffect(locationUiState.selectedMarkerPlaceId) {
-        locationUiState.selectedMarkerPlaceId?.let { placeId ->
-            locationViewModel.getPlaceImage(placeId)
-        }
-    }
-
-     */
-
-
     val focusManager = LocalFocusManager.current
 
     if (homeUiState.drinksList != null) {
@@ -310,15 +299,10 @@ fun LocationPopUp(
                 .background(Color.White)
                 .padding(20.dp)
         ) {
-            if (locationUiState.locationPopUpLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .width(64.dp)
-                        .align(Alignment.Center),
-                    color = LightBlue,
-                    trackColor = DarkBlue
-                )
-            } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
                 Row(
                     modifier = Modifier.fillMaxSize(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -409,6 +393,22 @@ fun LocationPopUp(
                                 modifier = Modifier.size(28.dp)
                             )
                         }
+                    }
+                }
+
+                // loading indicator
+                if (locationUiState.locationPopUpLoading) {
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(Color.White),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.width(64.dp),
+                            color = LightBlue,
+                            trackColor = DarkBlue
+                        )
                     }
                 }
             }
