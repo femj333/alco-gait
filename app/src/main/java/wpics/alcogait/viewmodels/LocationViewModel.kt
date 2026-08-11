@@ -19,6 +19,7 @@ import com.google.android.libraries.places.api.model.CircularBounds
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.RectangularBounds
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
+import com.google.android.libraries.places.api.net.FetchResolvedPhotoUriRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.SearchByTextRequest
 import com.google.android.libraries.places.api.net.SearchNearbyRequest
@@ -70,7 +71,12 @@ class LocationViewModel(
      */
     fun getAddressFromCoordinates(latitude: Float, longitude: Float) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null
+                )
+            }
 
             try {
                 val response = RetrofitInstance.geocodingService.reverseGeocode(
@@ -79,19 +85,29 @@ class LocationViewModel(
                 )
                 Log.d("Geocoding", "Status=${response.status}, results=${response.results}")
 
-                val address = response.results.firstOrNull()?.formatted_address
-                if (address != null) {
+                val result = response.results.firstOrNull()
+                if (result != null) {
                     _uiState.update {
-                        it.copy(address = address, isLoading = false)
+                        it.copy(
+                            address = result.formatted_address,
+                            selectedMarkerPlaceId = result.place_id,
+                            isLoading = false
+                        )
                     }
                 } else {
                     _uiState.update {
-                        it.copy(errorMessage = "No address found", isLoading = false)
+                        it.copy(
+                            errorMessage = "No address found",
+                            isLoading = false
+                        )
                     }
                 }
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(errorMessage = e.message, isLoading = false)
+                    it.copy(
+                        errorMessage = e.message,
+                        isLoading = false
+                    )
                 }
             }
         }
@@ -260,5 +276,62 @@ class LocationViewModel(
                     Log.e("LocationViewModel: selectPlace", "Error selecting place", e)
                 }
         }
+    }
+
+    fun getPlaceImage(placeId: String) {
+        _uiState.update {
+            it.copy(
+                isLoading = true,
+                errorMessage = null
+            )
+        }
+
+        // fields to include in response
+        val placeFields = listOf(Place.Field.PHOTO_METADATAS)
+
+        // get place object
+        val request = FetchPlaceRequest.builder(placeId, placeFields).build()
+
+        placesClient.fetchPlace(request)
+            .addOnSuccessListener { response ->
+                // get photo metadata
+                val metadata = response.place.photoMetadatas
+                if (metadata == null || metadata.isEmpty()) {
+                    Log.w("LocationViewModel", "No photo metadata")
+                    return@addOnSuccessListener
+                }
+                val photoMetadata = metadata[0]
+
+                // get attribution text and author attributions
+                val attributions = photoMetadata.attributions
+                val authorAttributions = photoMetadata.authorAttributions
+
+                // create request
+                val request = FetchResolvedPhotoUriRequest.builder(photoMetadata)
+                    .setMaxWidth(500)
+                    .setMaxHeight(300)
+                    .build()
+
+                placesClient.fetchResolvedPhotoUri(request)
+                    .addOnSuccessListener { response ->
+                        _uiState.update {
+                            it.copy(
+                                placePhotoUri = response.uri,
+                                placePhotoAttributions = attributions,
+                                placePhotoAuthorAttributions = authorAttributions,
+                                isLoading = false
+                            )
+                        }
+                    }
+            }
+            .addOnFailureListener { e ->
+                Log.e("LocationViewModel", "Place not found", e)
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = e.message
+                    )
+                }
+            }
     }
 }

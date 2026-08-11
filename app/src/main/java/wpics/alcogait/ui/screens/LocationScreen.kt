@@ -1,6 +1,7 @@
 package wpics.alcogait.ui.screens
 
 import android.Manifest
+import android.R.attr.onClick
 import android.content.pm.PackageManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -66,6 +67,11 @@ import wpics.alcogait.viewmodels.HomeViewModel
 import wpics.alcogait.viewmodels.LocationUiState
 import wpics.alcogait.viewmodels.LocationViewModel
 import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.shape.CircleShape
+import coil3.compose.AsyncImage
+import wpics.alcogait.ui.theme.LightGray
 
 @Composable
 fun LocationScreen(
@@ -77,6 +83,7 @@ fun LocationScreen(
 ) {
     val context = LocalContext.current
     val cameraPositionState = rememberCameraPositionState()
+    var selectedDrink by remember { mutableStateOf<Drinks?>(null) }
 
     LaunchedEffect(homeUiState.currentUser) {
         // get the drinks list for the user from the database
@@ -114,6 +121,12 @@ fun LocationScreen(
                 )
                 cameraPositionState.position = CameraPosition.fromLatLngZoom(recentDrinkLatLng, 15f)
             }
+        }
+    }
+
+    LaunchedEffect(locationUiState.selectedMarkerPlaceId) {
+        locationUiState.selectedMarkerPlaceId?.let { placeId ->
+            locationViewModel.getPlaceImage(placeId)
         }
     }
 
@@ -166,10 +179,6 @@ fun DrinkLocationMap(
     cameraPositionState: CameraPositionState
 ) {
     var selectedDrink by remember { mutableStateOf<Drinks?>(null) }
-
-    // initial camera positioning
-    val recentDrinkLatLng = LatLng(drinksList.last().latitude.toDouble(), drinksList.last().longitude.toDouble())
-
 
     Box(
         modifier = Modifier
@@ -249,7 +258,7 @@ fun LocationPopUp(
 
     Box(
         modifier = Modifier
-            .width(320.dp)
+            .size(320.dp, height = 300.dp)
             .dropShadow(
                 shape = RoundedCornerShape(20.dp),
                 shadow = Shadow(
@@ -273,44 +282,87 @@ fun LocationPopUp(
             .padding(20.dp)
     ) {
 
-        Column(
-            modifier = Modifier
+        Row(
+            modifier = Modifier.fillMaxSize()
         ) {
-            // address
-            if (address != null) {
+            Column(
+                modifier = Modifier.weight(1f)
+
+            ) {
+                Row(
+                    modifier = Modifier
+                ) {
+                    // close button
+                    Box(
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clickable(onClick = onDismiss)
+                            .dropShadow(
+                                shape = CircleShape,
+                                shadow = Shadow(
+                                    radius = 4.dp,
+                                    spread = 0.dp,
+                                    color = Color.Black.copy(alpha = 0.4f),
+                                    offset = DpOffset(x = 0.dp, y = 2.dp)
+                                )
+                            )
+                            .dropShadow(
+                                shape = CircleShape,
+                                shadow = Shadow(
+                                    radius = 13.dp,
+                                    spread = (-3).dp,
+                                    color = Color.Black.copy(alpha = 0.3f),
+                                    offset = DpOffset(x = 0.dp, y = 7.dp)
+                                )
+                            )
+                            .clip(CircleShape)
+                            .background(Color.White, CircleShape),
+                    ) {
+                        Text("x", fontSize = 12.sp, color = LightGray)
+                    }
+
+                    // address
+                    if (address != null) {
+                        Text(
+                            text = address,
+                            color = DarkBlue,
+                        )
+                    } else {
+                        locationUiState.errorMessage?.let {
+                            Text(
+                                text = it,
+                                color = DarkBlue,
+                            )
+                        }
+                    }
+                }
+
+
                 Text(
-                    text = address,
-                    color = DarkBlue,
+                    text = "History",
+                    color = Color.Black,
+                    modifier = Modifier.padding(top = 20.dp)
                 )
-            } else {
-                locationUiState.errorMessage?.let {
+
+                timeAndPlaceOfDrinks?.takeLast(3)?.forEach { drink ->
+                    val date = formatAsReadableDate(drink.first)
+                    val drunkState = drink.second?.lowercase()?.replaceFirstChar { it.titlecase() }
                     Text(
-                        text = it,
-                        color = DarkBlue,
+                        text = "$date: $drunkState",
+                        color = DarkBlue
                     )
                 }
             }
 
-            Text(
-                text = "History",
-                color = Color.Black,
-                modifier = Modifier.padding(top = 20.dp)
-            )
-
-            timeAndPlaceOfDrinks?.forEach { drink ->
-                val date = formatAsReadableDate(drink.first)
-                val drunkState = drink.second?.lowercase()?.replaceFirstChar { it.titlecase() }
-                Text(
-                    text = "$date: $drunkState",
-                    color = DarkBlue
+            // image
+            locationUiState.placePhotoUri?.let { uri ->
+                AsyncImage(
+                    model = uri,
+                    contentDescription = "Place photo",
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(10.dp))
                 )
-            }
-
-            Button(
-                onClick = onDismiss,
-                modifier = Modifier.align(Alignment.End)
-            ) {
-                Text("Close")
             }
         }
     }

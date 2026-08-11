@@ -288,7 +288,7 @@ fun SearchBar(
                             Text(
                                 text = "Find location",
                                 fontSize = 16.sp,
-                                color = DarkBlue
+                                color = LightGray
                             )
                         }
                         innerTextField()
@@ -315,7 +315,7 @@ fun SearchBar(
                     predictionsList.forEach { prediction ->
                         Text(
                             text = prediction.getFullText(null).toString(),
-                            color = LightGray,
+                            color = DarkBlue,
                             fontSize = 14.sp,
                             modifier = Modifier
                                 .fillMaxWidth()
