@@ -126,12 +126,15 @@ fun LocationScreen(
         }
     }
 
+    /*
     // get the place's image each time a new marker is selected
     LaunchedEffect(locationUiState.selectedMarkerPlaceId) {
         locationUiState.selectedMarkerPlaceId?.let { placeId ->
             locationViewModel.getPlaceImage(placeId)
         }
     }
+
+     */
 
 
     val focusManager = LocalFocusManager.current
@@ -271,15 +274,7 @@ fun LocationPopUp(
     onDismiss: () -> Unit
 ) {
     LaunchedEffect(drink) {
-        locationViewModel.getDateAndDrunkStateOfDrinksAtLocation(
-            drink.userId,
-            drink.latitude,
-            drink.longitude
-        )
-        locationViewModel.getAddressOrNameFromCoordinates(
-            drink.latitude,
-            drink.longitude
-        )
+        locationViewModel.loadLocationPopup(drink.userId, drink.latitude, drink.longitude)
     }
 
     val dateAndStateOfDrinks = locationUiState.dateAndStateOfDrinks

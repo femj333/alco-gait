@@ -71,12 +71,15 @@ class LocationViewModel(
      */
     fun getAddressOrNameFromCoordinates(latitude: Float, longitude: Float) {
         viewModelScope.launch {
+            /*
             _uiState.update {
                 it.copy(
                     locationPopUpLoading = true,
                     errorMessage = null
                 )
             }
+
+             */
 
             try {
                 val response = RetrofitInstance.geocodingService.reverseGeocode(
@@ -103,7 +106,7 @@ class LocationViewModel(
                             _uiState.update {
                                 it.copy(
                                     displayName = response.place.name,
-                                    locationPopUpLoading = false
+                                    /* locationPopUpLoading = false */
                                 )
                             }
                         }
@@ -111,7 +114,7 @@ class LocationViewModel(
                             _uiState.update {
                                 it.copy(
                                     errorMessage = e.message,
-                                    locationPopUpLoading = false
+                                    /* locationPopUpLoading = false */
                                 )
                             }
                         }
@@ -119,7 +122,7 @@ class LocationViewModel(
                     _uiState.update {
                         it.copy(
                             errorMessage = "No address found",
-                            locationPopUpLoading = false
+                            /* locationPopUpLoading = false */
                         )
                     }
                 }
@@ -127,7 +130,7 @@ class LocationViewModel(
                 _uiState.update {
                     it.copy(
                         errorMessage = e.message,
-                        locationPopUpLoading = false
+                        /* locationPopUpLoading = false */
                     )
                 }
             }
@@ -176,7 +179,7 @@ class LocationViewModel(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    locationPopUpLoading = true,
+                    /* locationPopUpLoading = true, */
                     errorMessage = null
                 )
             }
@@ -186,7 +189,7 @@ class LocationViewModel(
             _uiState.update {
                 it.copy(
                     dateAndStateOfDrinks = dateAndStateOfDrinks,
-                    locationPopUpLoading = false
+                    /* locationPopUpLoading = false */
                 )
             }
         }
@@ -320,7 +323,7 @@ class LocationViewModel(
     fun getPlaceImage(placeId: String) {
         _uiState.update {
             it.copy(
-                locationPopUpLoading = true,
+                /* locationPopUpLoading = true, */
                 errorMessage = null
             )
         }
@@ -342,7 +345,7 @@ class LocationViewModel(
                             placePhotoUri = null,
                             placePhotoAttributions = null,
                             placePhotoAuthorAttributions = null,
-                            locationPopUpLoading = false
+                            /* locationPopUpLoading = false */
                         )
                     }
                     return@addOnSuccessListener
@@ -366,7 +369,7 @@ class LocationViewModel(
                                 placePhotoUri = response.uri,
                                 placePhotoAttributions = attributions,
                                 placePhotoAuthorAttributions = authorAttributions,
-                                locationPopUpLoading = false
+                                /* locationPopUpLoading = false */
                             )
                         }
                     }
@@ -375,10 +378,45 @@ class LocationViewModel(
                 Log.e("LocationViewModel", "Place not found", e)
                 _uiState.update {
                     it.copy(
-                        locationPopUpLoading = false,
+                        /* locationPopUpLoading = false, */
                         errorMessage = e.message
                     )
                 }
             }
+    }
+
+    fun loadLocationPopup(userId: Long, latitude: Float, longitude: Float) {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    locationPopUpLoading = true,
+                    errorMessage = null
+                )
+            }
+
+            try {
+                getAddressOrNameFromCoordinates(latitude, longitude)
+
+                getDateAndDrunkStateOfDrinksAtLocation(userId, latitude, longitude)
+
+                val placeId = _uiState.value.selectedMarkerPlaceId
+                if (placeId != null) {
+                    getPlaceImage(placeId)
+                }
+
+                _uiState.update {
+                    it.copy(
+                        locationPopUpLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        errorMessage = e.message,
+                        locationPopUpLoading = false
+                    )
+                }
+            }
+        }
     }
 }
