@@ -7,7 +7,7 @@ import com.google.android.libraries.places.api.model.Place
 
 data class LocationUiState(
     val numDrinksAtLocation: HashMap<Pair<Float, Float>, Int>? = null,
-    val timeAndPlaceOfDrinks: List<Pair<String, String?>>? = null,
+    val dateAndStateOfDrinks: List<Pair<String, String?>>? = null,
     val placePredictions: List<AutocompletePrediction> = emptyList(),
     val selectedPlace: Place? = null,
     val selectedMarkerPlaceId: String? = null,
@@ -19,5 +19,6 @@ data class LocationUiState(
     val latitude: Float? = null,
     val longitude: Float? = null,
     val isLoading: Boolean = false,
+    val locationPopUpLoading: Boolean = false,
     val errorMessage: String? = null
 )

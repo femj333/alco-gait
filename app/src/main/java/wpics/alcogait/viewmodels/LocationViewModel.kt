@@ -73,7 +73,7 @@ class LocationViewModel(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    isLoading = true,
+                    locationPopUpLoading = true,
                     errorMessage = null
                 )
             }
@@ -103,7 +103,7 @@ class LocationViewModel(
                             _uiState.update {
                                 it.copy(
                                     displayName = response.place.name,
-                                    isLoading = false
+                                    locationPopUpLoading = false
                                 )
                             }
                         }
@@ -111,7 +111,7 @@ class LocationViewModel(
                             _uiState.update {
                                 it.copy(
                                     errorMessage = e.message,
-                                    isLoading = false
+                                    locationPopUpLoading = false
                                 )
                             }
                         }
@@ -119,7 +119,7 @@ class LocationViewModel(
                     _uiState.update {
                         it.copy(
                             errorMessage = "No address found",
-                            isLoading = false
+                            locationPopUpLoading = false
                         )
                     }
                 }
@@ -127,7 +127,7 @@ class LocationViewModel(
                 _uiState.update {
                     it.copy(
                         errorMessage = e.message,
-                        isLoading = false
+                        locationPopUpLoading = false
                     )
                 }
             }
@@ -145,7 +145,10 @@ class LocationViewModel(
         viewModelScope.launch {
             val numDrinks = walkRepository.getNumDrinksAtLocation(userId, latitude, longitude)
             _uiState.update {
-                it.copy(numDrinksAtLocation = hashMapOf(Pair(latitude, longitude) to numDrinks))
+                it.copy(
+                    numDrinksAtLocation =
+                        hashMapOf(Pair(latitude, longitude) to numDrinks)
+                )
             }
         }
     }
@@ -163,18 +166,28 @@ class LocationViewModel(
     }
 
     /**
-     * Gets the time and place of all logged drinking for a user at a location and updates the UI state
+     * Gets the date and drunk state of all logged drinking for a user at a location and updates the UI state
      *
      * @param userId the ID of the user
      * @param latitude the latitude of the location
      * @param longitude the longitude of the location
      */
-    fun getTimeAndPlaceOfDrinksAtLocation(userId: Long, latitude: Float, longitude: Float) {
+    fun getDateAndDrunkStateOfDrinksAtLocation(userId: Long, latitude: Float, longitude: Float) {
         viewModelScope.launch {
-            val timeAndPlaceOfDrinks =
-                walkRepository.getTimeAndPlaceOfDrinksAtLocation(userId, latitude, longitude)
             _uiState.update {
-                it.copy(timeAndPlaceOfDrinks = timeAndPlaceOfDrinks)
+                it.copy(
+                    locationPopUpLoading = true,
+                    errorMessage = null
+                )
+            }
+
+            val dateAndStateOfDrinks =
+                walkRepository.getDateAndDrunkStateOfDrinksAtLocation(userId, latitude, longitude)
+            _uiState.update {
+                it.copy(
+                    dateAndStateOfDrinks = dateAndStateOfDrinks,
+                    locationPopUpLoading = false
+                )
             }
         }
     }
@@ -307,7 +320,7 @@ class LocationViewModel(
     fun getPlaceImage(placeId: String) {
         _uiState.update {
             it.copy(
-                isLoading = true,
+                locationPopUpLoading = true,
                 errorMessage = null
             )
         }
@@ -329,7 +342,7 @@ class LocationViewModel(
                             placePhotoUri = null,
                             placePhotoAttributions = null,
                             placePhotoAuthorAttributions = null,
-                            isLoading = false
+                            locationPopUpLoading = false
                         )
                     }
                     return@addOnSuccessListener
@@ -353,7 +366,7 @@ class LocationViewModel(
                                 placePhotoUri = response.uri,
                                 placePhotoAttributions = attributions,
                                 placePhotoAuthorAttributions = authorAttributions,
-                                isLoading = false
+                                locationPopUpLoading = false
                             )
                         }
                     }
@@ -362,7 +375,7 @@ class LocationViewModel(
                 Log.e("LocationViewModel", "Place not found", e)
                 _uiState.update {
                     it.copy(
-                        isLoading = false,
+                        locationPopUpLoading = false,
                         errorMessage = e.message
                     )
                 }
