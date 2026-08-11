@@ -128,7 +128,7 @@ fun LocationScreen(
 
     val focusManager = LocalFocusManager.current
 
-    if (homeUiState.drinksList != null) {
+    if (!homeUiState.drinksList.isNullOrEmpty()) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -181,7 +181,7 @@ fun DrinkLocationMap(
     // initially center camera on most recently logged drink
     LaunchedEffect(Unit) {
         val drinks = homeUiState.drinksList
-        if (drinks != null) {
+        if (!drinks.isNullOrEmpty()) {
             val recentDrinkLatLng = LatLng(
                 drinks.last().latitude.toDouble(),
                 drinks.last().longitude.toDouble()
