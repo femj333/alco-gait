@@ -69,12 +69,16 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import coil3.compose.AsyncImage
 import wpics.alcogait.ui.theme.LightGray
@@ -89,8 +93,8 @@ fun LocationScreen(
 ) {
     val context = LocalContext.current
     val cameraPositionState = rememberCameraPositionState()
-    var selectedDrink by remember { mutableStateOf<Drinks?>(null) }
 
+    // get information for each user when the screen is first loaded
     LaunchedEffect(homeUiState.currentUser) {
         // get the drinks list for the user from the database
         if (homeUiState.currentUser != null) {
@@ -107,8 +111,8 @@ fun LocationScreen(
         }
     }
 
+    // center the camera on the selected search location
     LaunchedEffect(locationUiState.selectedPlace) {
-        // center the camera on the selected search location
         val selectedPlace = locationUiState.selectedPlace
         if (selectedPlace != null) {
             val latLng = selectedPlace.latLng
@@ -117,24 +121,16 @@ fun LocationScreen(
             cameraPositionState.animate(
                 update = CameraUpdateFactory.newLatLngZoom(latLng, 15f)
             )
-        } else { // center the camera on the most recently logged drink
-            val drinks = homeUiState.drinksList
-
-            if (drinks != null) {
-                val recentDrinkLatLng = LatLng(
-                    drinks.last().latitude.toDouble(),
-                    drinks.last().longitude.toDouble()
-                )
-                cameraPositionState.position = CameraPosition.fromLatLngZoom(recentDrinkLatLng, 15f)
-            }
         }
     }
 
+    // get the place's image each time a new marker is selected
     LaunchedEffect(locationUiState.selectedMarkerPlaceId) {
         locationUiState.selectedMarkerPlaceId?.let { placeId ->
             locationViewModel.getPlaceImage(placeId)
         }
     }
+
 
     val focusManager = LocalFocusManager.current
 
@@ -185,6 +181,31 @@ fun DrinkLocationMap(
     cameraPositionState: CameraPositionState
 ) {
     var selectedDrink by remember { mutableStateOf<Drinks?>(null) }
+
+    // initially center camera on most recently logged drink
+    LaunchedEffect(Unit) {
+        val drinks = homeUiState.drinksList
+        if (drinks != null) {
+            val recentDrinkLatLng = LatLng(
+                drinks.last().latitude.toDouble(),
+                drinks.last().longitude.toDouble()
+            )
+            cameraPositionState.position = CameraPosition.fromLatLngZoom(recentDrinkLatLng, 15f)
+        }
+    }
+
+    // re-center camera whenever a marker is selected
+    LaunchedEffect(selectedDrink) {
+        if (selectedDrink != null) {
+            val selectedDrinkLatLng = LatLng(
+                selectedDrink!!.latitude.toDouble(),
+                selectedDrink!!.longitude.toDouble()
+            )
+            cameraPositionState.animate(
+                update = CameraUpdateFactory.newLatLngZoom(selectedDrinkLatLng, 15f)
+            )
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -292,54 +313,97 @@ fun LocationPopUp(
                 .padding(20.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Column(
-                    modifier = Modifier.weight(1f)
-
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     // address header
                     if (address != null) {
                         Text(
                             text = address.substringBefore(","),
                             color = DarkBlue,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold
                         )
                     } else {
                         locationUiState.errorMessage?.let {
                             Text(
                                 text = it,
                                 color = DarkBlue,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                     }
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                        thickness = 1.dp,
+                        color = LightGray.copy(alpha = 0.4f)
+                    )
 
                     // location drinking history
                     Text(
                         text = "History",
                         color = Color.Black,
-                        modifier = Modifier.padding(top = 20.dp)
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium
                     )
 
-                    timeAndPlaceOfDrinks?.takeLast(3)?.forEach { drink ->
-                        val date = formatAsReadableDate(drink.first)
-                        val drunkState =
-                            drink.second?.lowercase()?.replaceFirstChar { it.titlecase() }
-                        Text(
-                            text = "$date: $drunkState",
-                            color = DarkBlue
-                        )
+                    Column(
+                        modifier = Modifier.padding(top = 1.dp),
+                        verticalArrangement = Arrangement.spacedBy(1.dp)
+                    ) {
+                        if (timeAndPlaceOfDrinks.isNullOrEmpty()) {
+                            Text(
+                                text = "No history yet",
+                                color = LightGray,
+                                fontSize = 13.sp
+                            )
+                        } else {
+                            timeAndPlaceOfDrinks.takeLast(3).forEach { drink ->
+                                val date = formatAsReadableDate(drink.first)
+                                val drunkState =
+                                    drink.second?.lowercase()?.replaceFirstChar { it.titlecase() }
+                                Text(
+                                    text = "$date: $drunkState",
+                                    color = DarkBlue,
+                                    fontSize = 13.sp
+                                )
+                            }
+                        }
                     }
                 }
 
-                // image
-                locationUiState.placePhotoUri?.let { uri ->
-                    AsyncImage(
-                        model = uri,
-                        contentDescription = "Place photo",
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(10.dp))
-                    )
+                // image or placeholder
+                Box(
+                    modifier = Modifier
+                        .width(110.dp)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(LightGray.copy(alpha = 0.15f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val uri = locationUiState.placePhotoUri
+                    if (uri != null) {
+                        AsyncImage(
+                            model = uri,
+                            contentDescription = "Place photo",
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Place,
+                            contentDescription = null,
+                            tint = LightGray,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
                 }
             }
         }

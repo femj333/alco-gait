@@ -278,6 +278,11 @@ class LocationViewModel(
         }
     }
 
+    /**
+     * Gets the image for a place and updates the UI state
+     *
+     * @param placeId the id of the place to get the image for
+     */
     fun getPlaceImage(placeId: String) {
         _uiState.update {
             it.copy(
@@ -298,6 +303,14 @@ class LocationViewModel(
                 val metadata = response.place.photoMetadatas
                 if (metadata == null || metadata.isEmpty()) {
                     Log.w("LocationViewModel", "No photo metadata")
+                    _uiState.update {
+                        it.copy(
+                            placePhotoUri = null,
+                            placePhotoAttributions = null,
+                            placePhotoAuthorAttributions = null,
+                            isLoading = false
+                        )
+                    }
                     return@addOnSuccessListener
                 }
                 val photoMetadata = metadata[0]
