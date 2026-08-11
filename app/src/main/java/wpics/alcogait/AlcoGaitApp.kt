@@ -22,7 +22,7 @@ class AlcoGaitApp : Application() {
          //var isNewDatabase = false
 
         if (!Places.isInitialized()) {
-            Places.initialize(applicationContext, BuildConfig.PLACES_API_KEY)
+            Places.initializeWithNewPlacesApiEnabled(applicationContext, BuildConfig.PLACES_API_KEY)
         }
 
         database = Room.databaseBuilder(this, AppDatabase::class.java, "alcogait_db")

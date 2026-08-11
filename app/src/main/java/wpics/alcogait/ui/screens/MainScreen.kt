@@ -87,27 +87,34 @@ fun MainScreen(
                     .fillMaxSize()
                     .statusBarsPadding(),
                 topBar = {
-                    if (currentRoute == "Location") {
-                        TopBar(
-                            onMenuClick = { menuBarVisible = !menuBarVisible },
-                            isLocationScreen = true
-                        )
-                    } else if (currentRoute == "Login"){
-                        TopBar(
-                            isLogin = true,
-                            navController = navController,
-                            route = "Login"
-                        )
-                    } else if (currentRoute == "Signup") {
-                        TopBar(
-                            isLogin = true,
-                            navController = navController,
-                            route = "Signup"
-                        )
-                    } else {
-                        TopBar(
-                            onMenuClick = { menuBarVisible = !menuBarVisible }
-                        )
+                    when (currentRoute) {
+                        "Location" -> {
+                            TopBar(
+                                onMenuClick = { menuBarVisible = !menuBarVisible },
+                                isLocationScreen = true,
+                                locationUiState = locationUiState,
+                                locationViewModel = locationViewModel
+                            )
+                        }
+                        "Login" -> {
+                            TopBar(
+                                isLogin = true,
+                                navController = navController,
+                                route = "Login"
+                            )
+                        }
+                        "Signup" -> {
+                            TopBar(
+                                isLogin = true,
+                                navController = navController,
+                                route = "Signup"
+                            )
+                        }
+                        else -> {
+                            TopBar(
+                                onMenuClick = { menuBarVisible = !menuBarVisible }
+                            )
+                        }
                     }
                 }
             ) { padding ->

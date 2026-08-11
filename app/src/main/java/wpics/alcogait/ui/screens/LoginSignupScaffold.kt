@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import wpics.alcogait.Routes
@@ -37,6 +38,7 @@ fun LoginSignupScaffold(
     textFields: @Composable () -> Unit
 ){
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(uiState.currentUser) {
         if (uiState.currentUser != null) {
@@ -61,8 +63,12 @@ fun LoginSignupScaffold(
         ) {
             textFields()
 
+            // login/signup button
             ButtonOne(
-                onClick = { onClick() },
+                onClick = {
+                    keyboardController?.hide()
+                    onClick()
+                },
                 width = 100,
                 height = 50,
                 contentAlignment = Alignment.Center,

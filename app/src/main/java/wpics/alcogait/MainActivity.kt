@@ -9,11 +9,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.location.LocationServices
+import wpics.alcogait.data.WalkRepository
 import wpics.alcogait.ui.theme.AlcoGaitTheme
 import wpics.alcogait.ui.screens.MainScreen
 
 class MainActivity : ComponentActivity() {
-
     // request location permissions
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()

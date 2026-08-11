@@ -1,11 +1,14 @@
 package wpics.alcogait.ui.screens
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -32,6 +35,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toLowerCase
@@ -39,6 +45,8 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -57,6 +65,7 @@ import wpics.alcogait.viewmodels.HomeUiState
 import wpics.alcogait.viewmodels.HomeViewModel
 import wpics.alcogait.viewmodels.LocationUiState
 import wpics.alcogait.viewmodels.LocationViewModel
+import android.util.Log
 
 @Composable
 fun LocationScreen(
@@ -66,20 +75,66 @@ fun LocationScreen(
     locationViewModel: LocationViewModel,
     homeViewModel: HomeViewModel
 ) {
-    // get the drinks list for the user from the database
+    val context = LocalContext.current
+    val cameraPositionState = rememberCameraPositionState()
+
     LaunchedEffect(homeUiState.currentUser) {
+        // get the drinks list for the user from the database
         if (homeUiState.currentUser != null) {
             homeViewModel.getDrinksByUserId(homeUiState.currentUser.userId)
         }
+
+        // check location permissions
+        val hasPermission = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        // store the users coordinates
+        if (hasPermission) {
+            locationViewModel.fetchCurrentLocation()
+        }
     }
+
+    LaunchedEffect(locationUiState.selectedPlace) {
+        // center the camera on the selected search location
+        val selectedPlace = locationUiState.selectedPlace
+        if (selectedPlace != null) {
+            val latLng = selectedPlace.latLng
+            Log.d("LocationScreen", "Selected place coordinates:$latLng")
+
+            cameraPositionState.animate(
+                update = CameraUpdateFactory.newLatLngZoom(latLng, 15f)
+            )
+        } else { // center the camera on the most recently logged drink
+            val drinks = homeUiState.drinksList
+
+            if (drinks != null) {
+                val recentDrinkLatLng = LatLng(
+                    drinks.last().latitude.toDouble(),
+                    drinks.last().longitude.toDouble()
+                )
+                cameraPositionState.position = CameraPosition.fromLatLngZoom(recentDrinkLatLng, 15f)
+            }
+        }
+    }
+
+    val focusManager = LocalFocusManager.current
 
     if (homeUiState.drinksList != null) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .navigationBarsPadding()
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = { focusManager.clearFocus() })
+                }
         ) {
-            DrinkLocationMap(homeUiState.drinksList, locationUiState, homeUiState, locationViewModel)
+            DrinkLocationMap(
+                homeUiState.drinksList,
+                locationUiState,
+                homeUiState,
+                locationViewModel,
+                cameraPositionState
+            )
         }
     } else {
         Box(
@@ -107,15 +162,14 @@ fun DrinkLocationMap(
     drinksList: List<Drinks>,
     locationUiState: LocationUiState,
     homeUiState: HomeUiState,
-    locationViewModel: LocationViewModel
+    locationViewModel: LocationViewModel,
+    cameraPositionState: CameraPositionState
 ) {
     var selectedDrink by remember { mutableStateOf<Drinks?>(null) }
 
     // initial camera positioning
     val recentDrinkLatLng = LatLng(drinksList.last().latitude.toDouble(), drinksList.last().longitude.toDouble())
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(recentDrinkLatLng, 15f)
-    }
+
 
     Box(
         modifier = Modifier
