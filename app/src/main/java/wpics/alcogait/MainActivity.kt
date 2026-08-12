@@ -15,6 +15,9 @@ import wpics.alcogait.ui.theme.AlcoGaitTheme
 import wpics.alcogait.ui.screens.MainScreen
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var mediaPlayer: MediaPlayer
+
     // request location permissions
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -41,7 +44,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val mediaPlayer = MediaPlayer.create(applicationContext, R.raw.jazz_music)
+        mediaPlayer = MediaPlayer.create(applicationContext, R.raw.jazz_music)
+            ?: throw IllegalStateException("Failed to load jazz music resource")
 
         permissionLauncher.launch(arrayOf(
             Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -54,5 +58,10 @@ class MainActivity : ComponentActivity() {
                 MainScreen(mediaPlayer = mediaPlayer)
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
     }
 }

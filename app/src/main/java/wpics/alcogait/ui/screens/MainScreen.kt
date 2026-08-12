@@ -134,7 +134,8 @@ fun MainScreen(
                             padding = padding,
                             uiState = homeUiState,
                             viewModel = homeViewModel,
-                            mediaPlayer = mediaPlayer
+                            mediaPlayer = mediaPlayer,
+                            playMusic = playMusic
                         )
                     }
 

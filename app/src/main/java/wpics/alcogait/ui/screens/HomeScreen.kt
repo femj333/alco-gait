@@ -69,19 +69,21 @@ fun HomeScreen(
     padding: PaddingValues,
     uiState: HomeUiState,
     viewModel: HomeViewModel,
-    mediaPlayer: MediaPlayer
+    mediaPlayer: MediaPlayer,
+    playMusic: Boolean
 ) {
     val context = LocalContext.current
 
     // play music
-    DisposableEffect(R.raw.jazz_music) {
+    DisposableEffect(Unit) {
         mediaPlayer.apply {
-            isLooping = true
-            start()
+            if (playMusic) {
+                isLooping = true
+                start()
+            }
         }
         onDispose {
-            mediaPlayer.stop()
-            mediaPlayer.release()
+            mediaPlayer.pause()
         }
     }
 
