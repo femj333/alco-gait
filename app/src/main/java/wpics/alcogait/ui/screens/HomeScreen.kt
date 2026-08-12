@@ -67,15 +67,21 @@ fun HomeScreen(
     displayCharacter: Boolean,
     padding: PaddingValues,
     uiState: HomeUiState,
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    mediaPlayer: MediaPlayer
 ) {
     val context = LocalContext.current
+
+    // play music
     DisposableEffect(R.raw.jazz_music) {
-        val mediaPlayer = MediaPlayer.create(context, R.raw.jazz_music).apply {
+        mediaPlayer.apply {
             isLooping = true
             start()
         }
-        onDispose { mediaPlayer.stop(); mediaPlayer.release()}
+        onDispose {
+            mediaPlayer.stop()
+            mediaPlayer.release()
+        }
     }
 
     LaunchedEffect(Unit) {

@@ -41,6 +41,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        val mediaPlayer = MediaPlayer.create(applicationContext, R.raw.jazz_music)
+
         permissionLauncher.launch(arrayOf(
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -49,7 +51,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AlcoGaitTheme {
-                MainScreen()
+                MainScreen(mediaPlayer = mediaPlayer)
             }
         }
     }
