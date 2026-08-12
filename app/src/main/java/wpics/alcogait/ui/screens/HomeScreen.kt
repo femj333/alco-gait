@@ -1,5 +1,9 @@
 package wpics.alcogait.ui.screens
 
+import android.Manifest
+import android.media.MediaPlayer
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +24,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +40,8 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat.requestPermissions
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getDrawable
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import wpics.alcogait.R
@@ -45,6 +52,8 @@ import wpics.alcogait.ui.theme.LightPink
 import wpics.alcogait.viewmodels.HomeUiState
 import wpics.alcogait.viewmodels.HomeViewModel
 import java.util.Locale
+import androidx.compose.runtime.DisposableEffect
+
 
 fun formatElapsed(millis: Long): String {
     val totalSeconds = millis / 1000
@@ -53,13 +62,41 @@ fun formatElapsed(millis: Long): String {
     return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
 }
 
+@SuppressLint("MissingPermission")
 @Composable
 fun HomeScreen(
     displayCharacter: Boolean,
     padding: PaddingValues,
     uiState: HomeUiState,
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    mediaPlayer: MediaPlayer,
+    playMusic: Boolean
 ) {
+    val context = LocalContext.current
+
+    // play music
+    DisposableEffect(Unit) {
+        mediaPlayer.apply {
+            if (playMusic) {
+                isLooping = true
+                start()
+            }
+        }
+        onDispose {
+            mediaPlayer.pause()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        val hasPermission = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACTIVITY_RECOGNITION
+        ) == PackageManager.PERMISSION_GRANTED
+        // track walking
+        if (hasPermission) {
+            viewModel.startWalkTracking()
+        }
+    }
+
     if (displayCharacter) {
         CharacterHomeScreen(uiState, viewModel, padding)
     } else {
@@ -104,6 +141,7 @@ fun CharacterHomeScreen(
         ) {
             CharacterDrunkStateSign(
                 stateText = uiState.drunkState.label,
+                finePrint = uiState.drunkState.finePrint,
                 fontSize = uiState.drunkState.fontSize
             )
         }
@@ -177,6 +215,7 @@ fun NoCharacterHomeScreen(
         ) {
             NoCharacterDrunkStateSign(
                 stateText = "YOU ARE ${uiState.drunkState.label}",
+                finePrint = uiState.drunkState.finePrint,
                 fontSize = 45
             )
         }
@@ -330,6 +369,7 @@ fun StartButton(
 @Composable
 fun CharacterDrunkStateSign(
     stateText: String,
+    finePrint: String,
     fontSize: Int
 ){
     Box(
@@ -411,6 +451,16 @@ fun CharacterDrunkStateSign(
                 fontSize = fontSize.sp,
                 modifier = Modifier
                     .align(Alignment.Center)
+                    .offset(y = (-2).dp)
+            )
+
+            Text(
+                text = finePrint,
+                color = LightPink,
+                fontSize = 10.sp,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (-14).dp)
             )
         }
     }
@@ -419,6 +469,7 @@ fun CharacterDrunkStateSign(
 @Composable
 fun NoCharacterDrunkStateSign(
     stateText: String,
+    finePrint: String,
     fontSize: Int
 ) {
     Box(
@@ -440,7 +491,7 @@ fun NoCharacterDrunkStateSign(
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .offset(x = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(13.5.dp),
 
             ){
             repeat(7) {
@@ -452,7 +503,7 @@ fun NoCharacterDrunkStateSign(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .offset(x = (-8).dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(13.5.dp),
 
             ){
             repeat(7) {
@@ -463,7 +514,7 @@ fun NoCharacterDrunkStateSign(
         Row(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = 11.dp),
+                .offset(y = 7.dp),
             horizontalArrangement = Arrangement.spacedBy(14.dp),
 
             ){
@@ -475,7 +526,7 @@ fun NoCharacterDrunkStateSign(
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .offset(y = (-11).dp),
+                .offset(y = (-7).dp),
             horizontalArrangement = Arrangement.spacedBy(14.dp),
 
             ){
@@ -493,12 +544,24 @@ fun NoCharacterDrunkStateSign(
                 color = LightPink,
                 textAlign = TextAlign.Center,
                 fontSize = fontSize.sp,
-                modifier = Modifier.width(250.dp),
+                modifier = Modifier
+                    .width(250.dp)
+                    .align(Alignment.Center)
+                    .offset(y = (-4).dp),
                 style = LocalTextStyle.current.merge(
                     TextStyle(lineHeight = 1.em)
                 )
             )
         }
+
+        Text(
+            text = finePrint,
+            color = LightPink,
+            fontSize = 10.sp,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = (-9).dp)
+        )
     }
 
 }

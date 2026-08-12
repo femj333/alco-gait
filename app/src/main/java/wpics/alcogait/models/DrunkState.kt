@@ -4,6 +4,7 @@ import wpics.alcogait.R
 
 data class DrunkState(
     val label: String = "SOBER",
+    val finePrint: String = "Your BAC is between 0.0-0.02",
     val image: Int = R.drawable.sober,
     val fontSize: Int = 60,
     val noCharacterText: String = "Your BAC is currently under the legal limit (0.08). It is safe to drive.",

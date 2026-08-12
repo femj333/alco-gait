@@ -1,5 +1,6 @@
 package wpics.alcogait.ui.screens
 
+import android.media.MediaPlayer
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -32,7 +33,8 @@ import wpics.alcogait.viewmodels.LocationViewModel
 @Composable
 fun MainScreen(
     homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
-    locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
+    locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory),
+    mediaPlayer: MediaPlayer
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -66,7 +68,14 @@ fun MainScreen(
                 displayChecked = displayCharacter,
                 onDisplayCheckedChange = { displayCharacter = it },
                 musicChecked = playMusic,
-                onMusicCheckedChange = { playMusic = it },
+                onMusicCheckedChange = {
+                    playMusic = it
+                    if (playMusic) {
+                        mediaPlayer.start()
+                    } else {
+                        mediaPlayer.pause()
+                    }
+                },
                 navController = navController,
                 uiState = homeUiState,
                 viewModel = homeViewModel,
@@ -124,7 +133,9 @@ fun MainScreen(
                             displayCharacter = displayCharacter,
                             padding = padding,
                             uiState = homeUiState,
-                            viewModel = homeViewModel
+                            viewModel = homeViewModel,
+                            mediaPlayer = mediaPlayer,
+                            playMusic = playMusic
                         )
                     }
 

@@ -2,6 +2,7 @@ package wpics.alcogait
 
 import android.Manifest
 import android.location.Location
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -14,17 +15,28 @@ import wpics.alcogait.ui.theme.AlcoGaitTheme
 import wpics.alcogait.ui.screens.MainScreen
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var mediaPlayer: MediaPlayer
+
     // request location permissions
-    private val locationPermissionLauncher = registerForActivityResult(
+    private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        val granted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true &&
+        val locationPermissionsGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true &&
                 permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
-        if (!granted) {
+        if (!locationPermissionsGranted) {
             // permission denied
             Log.d("MainActivity", "Location permission denied")
         } else {
             Log.d("MainActivity", "Location permission granted")
+        }
+
+        val activityRecognitionPermissionsGranted = permissions[Manifest.permission.ACTIVITY_RECOGNITION] == true
+        if (!activityRecognitionPermissionsGranted) {
+            // permission denied
+            Log.d("MainActivity", "Activity recognition permission denied")
+        } else {
+            Log.d("MainActivity", "Activity recognition permission granted")
         }
     }
 
@@ -32,15 +44,24 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        locationPermissionLauncher.launch(arrayOf(
+        mediaPlayer = MediaPlayer.create(applicationContext, R.raw.jazz_music)
+            ?: throw IllegalStateException("Failed to load jazz music resource")
+
+        permissionLauncher.launch(arrayOf(
             Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACTIVITY_RECOGNITION
         ))
 
         setContent {
             AlcoGaitTheme {
-                MainScreen()
+                MainScreen(mediaPlayer = mediaPlayer)
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
     }
 }
