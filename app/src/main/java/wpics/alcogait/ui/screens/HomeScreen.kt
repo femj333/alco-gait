@@ -54,6 +54,7 @@ import wpics.alcogait.viewmodels.HomeViewModel
 import java.util.Locale
 import androidx.compose.runtime.DisposableEffect
 
+
 fun formatElapsed(millis: Long): String {
     val totalSeconds = millis / 1000
     val minutes = totalSeconds / 60
@@ -138,6 +139,7 @@ fun CharacterHomeScreen(
         ) {
             CharacterDrunkStateSign(
                 stateText = uiState.drunkState.label,
+                finePrint = uiState.drunkState.finePrint,
                 fontSize = uiState.drunkState.fontSize
             )
         }
@@ -211,6 +213,7 @@ fun NoCharacterHomeScreen(
         ) {
             NoCharacterDrunkStateSign(
                 stateText = "YOU ARE ${uiState.drunkState.label}",
+                finePrint = uiState.drunkState.finePrint,
                 fontSize = 45
             )
         }
@@ -364,6 +367,7 @@ fun StartButton(
 @Composable
 fun CharacterDrunkStateSign(
     stateText: String,
+    finePrint: String,
     fontSize: Int
 ){
     Box(
@@ -445,6 +449,16 @@ fun CharacterDrunkStateSign(
                 fontSize = fontSize.sp,
                 modifier = Modifier
                     .align(Alignment.Center)
+                    .offset(y = (-2).dp)
+            )
+
+            Text(
+                text = finePrint,
+                color = LightPink,
+                fontSize = 10.sp,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .offset(y = (-14).dp)
             )
         }
     }
@@ -453,6 +467,7 @@ fun CharacterDrunkStateSign(
 @Composable
 fun NoCharacterDrunkStateSign(
     stateText: String,
+    finePrint: String,
     fontSize: Int
 ) {
     Box(
@@ -474,7 +489,7 @@ fun NoCharacterDrunkStateSign(
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .offset(x = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(13.5.dp),
 
             ){
             repeat(7) {
@@ -486,7 +501,7 @@ fun NoCharacterDrunkStateSign(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .offset(x = (-8).dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(13.5.dp),
 
             ){
             repeat(7) {
@@ -497,7 +512,7 @@ fun NoCharacterDrunkStateSign(
         Row(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = 11.dp),
+                .offset(y = 7.dp),
             horizontalArrangement = Arrangement.spacedBy(14.dp),
 
             ){
@@ -509,7 +524,7 @@ fun NoCharacterDrunkStateSign(
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .offset(y = (-11).dp),
+                .offset(y = (-7).dp),
             horizontalArrangement = Arrangement.spacedBy(14.dp),
 
             ){
@@ -527,12 +542,24 @@ fun NoCharacterDrunkStateSign(
                 color = LightPink,
                 textAlign = TextAlign.Center,
                 fontSize = fontSize.sp,
-                modifier = Modifier.width(250.dp),
+                modifier = Modifier
+                    .width(250.dp)
+                    .align(Alignment.Center)
+                    .offset(y = (-4).dp),
                 style = LocalTextStyle.current.merge(
                     TextStyle(lineHeight = 1.em)
                 )
             )
         }
+
+        Text(
+            text = finePrint,
+            color = LightPink,
+            fontSize = 10.sp,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = (-9).dp)
+        )
     }
 
 }

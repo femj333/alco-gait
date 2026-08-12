@@ -30,6 +30,13 @@ class GaitAnalyzer {
             else -> "WASTED"
         }
 
+        val finePrint = when (label) {
+            "SOBER" -> "Your BAC is between 0.0-0.02"
+            "TIPSY" -> "Your BAC is between 0.02-0.08"
+            "DRUNK" -> "Your BAC is between 0.08-0.1"
+            else -> "Your BAC is above 0.1"
+        }
+
         val image = when (label) {
             "SOBER" -> R.drawable.sober
             "TIPSY" -> R.drawable.tipsy
@@ -53,7 +60,7 @@ class GaitAnalyzer {
 
         val fontSize = if (label == "WASTED") 50 else 60
 
-        val drunkState = DrunkState(label, image, fontSize, noCharacterText, noCharacterDrinks)
+        val drunkState = DrunkState(label, finePrint, image, fontSize, noCharacterText, noCharacterDrinks)
         magnitudes.clear()
         return drunkState
     }
