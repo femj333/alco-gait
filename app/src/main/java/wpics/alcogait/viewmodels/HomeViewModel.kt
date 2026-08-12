@@ -110,9 +110,15 @@ class HomeViewModel(
             WalkTrackingEvents.events.collect { event ->
                 when (event) {
                     WalkTrackingEvent.STARTED_WALKING ->
-                        if (!uiState.value.isRecording) onStartClicked()
+                        if (!uiState.value.isRecording) {
+                            onStartClicked()
+                            Log.d("HomeViewModel", "Started recording")
+                        }
                     WalkTrackingEvent.STOPPED_WALKING ->
-                        if (uiState.value.isRecording) onStopClicked()
+                        if (uiState.value.isRecording) {
+                            onStopClicked()
+                            Log.d("HomeViewModel", "Stopped recording")
+                        }
                 }
             }
         }
@@ -221,11 +227,6 @@ class HomeViewModel(
             }
 
             if (success) {
-                if (uiState.value.currentUser != null) {
-                    Log.d("HomeViewModel", "User ID: ${uiState.value.currentUser?.userId}")
-                } else {
-                    Log.d("HomeViewModel", "User ID: null")
-                }
                 val userId = uiState.value.currentUser?.userId ?: 0
 
                 // save in database
