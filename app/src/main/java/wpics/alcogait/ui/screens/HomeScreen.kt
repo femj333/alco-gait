@@ -1,6 +1,7 @@
 package wpics.alcogait.ui.screens
 
 import android.Manifest
+import android.media.MediaPlayer
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.compose.foundation.Image
@@ -51,6 +52,7 @@ import wpics.alcogait.ui.theme.LightPink
 import wpics.alcogait.viewmodels.HomeUiState
 import wpics.alcogait.viewmodels.HomeViewModel
 import java.util.Locale
+import androidx.compose.runtime.DisposableEffect
 
 fun formatElapsed(millis: Long): String {
     val totalSeconds = millis / 1000
@@ -68,6 +70,13 @@ fun HomeScreen(
     viewModel: HomeViewModel
 ) {
     val context = LocalContext.current
+    DisposableEffect(R.raw.jazz_music) {
+        val mediaPlayer = MediaPlayer.create(context, R.raw.jazz_music).apply {
+            isLooping = true
+            start()
+        }
+        onDispose { mediaPlayer.stop(); mediaPlayer.release()}
+    }
 
     LaunchedEffect(Unit) {
         val hasPermission = ContextCompat.checkSelfPermission(
