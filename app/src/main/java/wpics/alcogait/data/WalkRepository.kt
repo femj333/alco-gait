@@ -26,6 +26,8 @@ class WalkRepository(
     suspend fun getDateAndDrunkStateOfDrinksAtLocation(userId: Long, latitude: Float, longitude: Float): List<Pair<String, String?>> =
         drinksDao.getDateAndDrunkStateOfDrinksAtLocation(userId, latitude, longitude)
 
+    suspend fun getNumDrinksByDrunkState(userId: Long, drunkState: String): Int =
+        drinksDao.getNumDrinksByDrunkState(userId, drunkState)
 
     /**
      * Registers a new user with the given information.

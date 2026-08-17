@@ -202,6 +202,10 @@ class LocationViewModel(
         }
     }
 
+    suspend fun getNumDrinksByDrunkState(userId: Long, drunkState: String): Int {
+        return walkRepository.getNumDrinksByDrunkState(userId, drunkState)
+    }
+
     /**
      * Gets autocomplete predictions based on the query. Cheap enough to call on every keystroke
      *

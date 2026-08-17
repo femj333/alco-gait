@@ -221,20 +221,7 @@ fun ProfileHeader(
             horizontalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             // profile icon
-            Box(
-                modifier = Modifier
-                    .size(60.dp)
-                    .background(color = DarkBlue, shape = CircleShape)
-            ){
-                Icon(
-                    painter = painterResource(id = R.drawable.profile_mask),
-                    contentDescription = "Profile Icon",
-                    tint = LightPink,
-                    modifier = Modifier
-                        .size(50.dp)
-                        .align(Alignment.Center)
-                )
-            }
+            ProfileIcon()
 
             // profile name
             Column(

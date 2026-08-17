@@ -144,7 +144,7 @@ fun MainScreen(
                     }
 
                     composable(Routes.Profile.route) {
-                        ProfileScreen(padding)
+                        ProfileScreen(padding, homeUiState, locationViewModel)
                     }
 
                     composable(Routes.Location.route) {
