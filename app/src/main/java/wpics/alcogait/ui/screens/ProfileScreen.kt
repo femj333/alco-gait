@@ -121,12 +121,7 @@ fun ProfileScreen(
                 .padding(10.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text(
-                text = "Drinking Statistics",
-                color = DarkBlue,
-                fontWeight = FontWeight.Bold,
-                fontSize = 25.sp
-            )
+            SectionHeader("Drinking Statistics")
 
             Box(modifier = Modifier
                 .fillMaxWidth()
@@ -174,25 +169,11 @@ fun ProfileScreen(
                 }
             }
 
-            Text(
-                text = "Rideshare",
-                color = DarkBlue
-            )
+            SectionHeader("Rideshare")
 
-            Text(
-                text = "Contact Information",
-                color = DarkBlue
-            )
+            SectionHeader("Contact Information")
 
-            Text(
-                text = "Notifications",
-                color = DarkBlue
-            )
-
-            Text(
-                text = "Drinking Statistics",
-                color = DarkBlue
-            )
+            SectionHeader("Notifications")
         }
     }
 }
@@ -222,6 +203,18 @@ fun DrinkingStats(
         )
 
     }
+}
+
+@Composable
+fun SectionHeader(
+    title: String
+) {
+    Text(
+        text = title,
+        color = DarkBlue,
+        fontWeight = FontWeight.Bold,
+        fontSize = 25.sp
+    )
 }
 
 @Composable
