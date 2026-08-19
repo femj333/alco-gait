@@ -67,6 +67,7 @@ dependencies {
     implementation("androidx.vectordrawable:vectordrawable-animated:1.2.0")
     implementation("io.coil-kt.coil3:coil-compose:3.0.4")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation(libs.androidx.ui)
     implementation(libs.androidx.compose.material3.lint)
     val room_version = "3.0.1"

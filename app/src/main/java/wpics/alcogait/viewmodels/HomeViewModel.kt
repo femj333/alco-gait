@@ -25,6 +25,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -34,6 +35,7 @@ import wpics.alcogait.data.Drinks
 import wpics.alcogait.data.GaitAnalyzer
 import wpics.alcogait.data.LocationHelper
 import wpics.alcogait.data.User
+import wpics.alcogait.data.UserPreferences
 import wpics.alcogait.data.Walk
 import wpics.alcogait.data.WalkCSVWriter
 import wpics.alcogait.data.WalkRepository
@@ -83,6 +85,8 @@ class HomeViewModel(
 
     private var locationHelper = LocationHelper(application)
     private var recordingLocation: Location? = null
+
+    private var userPreferences = UserPreferences(application)
 
     private val myPendingIntent: PendingIntent by lazy {
         val intent = Intent(getApplication(), ActivityTransitionReceiver::class.java)
@@ -276,18 +280,23 @@ class HomeViewModel(
                 email,
                 phoneNumber
             )
-            _uiState.update {
-                it.copy(currentUser = user)
-            }
 
             if (user == null) {
                 _uiState.update {
-                    it.copy(errorMessage = "Username already exists")
+                    it.copy(
+                        errorMessage = "Username already exists"
+                    )
                 }
             } else {
+                Log.d("HomeViewModel", "Current user: $user")
                 _uiState.update {
-                    it.copy(errorMessage = null)
+                    it.copy(
+                        currentUser = user,
+                        errorMessage = null
+                    )
                 }
+
+                userPreferences.saveLastUserId(user.userId.toString())
             }
         }
     }
@@ -298,18 +307,22 @@ class HomeViewModel(
     ) {
         viewModelScope.launch {
             val user = walkRepository.login(username, password)
-            _uiState.update {
-                it.copy(currentUser = user)
-            }
 
             if (user == null) {
                 _uiState.update {
-                    it.copy(errorMessage = "Incorrect username or password")
+                    it.copy(
+                        errorMessage = "Incorrect username or password"
+                    )
                 }
             } else {
                 _uiState.update {
-                    it.copy(errorMessage = null)
+                    it.copy(
+                        currentUser = user,
+                        errorMessage = null
+                    )
                 }
+
+                userPreferences.saveLastUserId(user.userId.toString())
             }
         }
     }
@@ -338,6 +351,32 @@ class HomeViewModel(
                     errorMessage= null
                 )
             }
+
+            userPreferences.clearLastUserId()
+        }
+    }
+
+    fun tryAutoLogin(onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            Log.d("AutoLogin", "started")
+            val savedUserId = userPreferences.lastUserId.first()
+            Log.d("AutoLogin", "saved user id: $savedUserId")
+
+            if (savedUserId != null) {
+                val user = walkRepository.getUserById(savedUserId.toLong())
+                Log.d("AutoLogin", "User: $user")
+                if (user != null) {
+                    _uiState.update {
+                        it.copy(
+                            currentUser = user
+                        )
+                    }
+                    onResult(true)
+                    return@launch
+                }
+                onResult(false)
+            }
+            onResult(false)
         }
     }
 

@@ -1,6 +1,8 @@
 package wpics.alcogait.ui.screens
 
 import android.media.MediaPlayer
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +31,7 @@ import wpics.alcogait.Routes
 import wpics.alcogait.ui.components.MenuBar
 import wpics.alcogait.ui.components.TopBar
 import wpics.alcogait.viewmodels.HomeViewModel
+import wpics.alcogait.ui.theme.DarkBlue
 import wpics.alcogait.viewmodels.LocationViewModel
 
 @Composable
@@ -36,6 +40,25 @@ fun MainScreen(
     locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory),
     mediaPlayer: MediaPlayer
 ) {
+    var sessionChecked by remember { mutableStateOf(false) }
+    var startDestination by remember { mutableStateOf(Routes.Login.route) }
+
+    LaunchedEffect(Unit) {
+        homeViewModel.tryAutoLogin { success ->
+            Log.d("MainScreen", "Autologin success: $success")
+            startDestination = if (success) Routes.Home.route else Routes.Login.route
+            sessionChecked = true
+        }
+    }
+
+    if (!sessionChecked) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(DarkBlue)
+        )
+        return
+    }
+
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -127,7 +150,7 @@ fun MainScreen(
                     }
                 }
             ) { padding ->
-                NavHost(navController = navController, startDestination = Routes.Login.route) {
+                NavHost(navController = navController, startDestination = startDestination) {
                     composable(Routes.Home.route) {
                         HomeScreen(
                             displayCharacter = displayCharacter,
@@ -144,7 +167,7 @@ fun MainScreen(
                     }
 
                     composable(Routes.Profile.route) {
-                        ProfileScreen(padding)
+                        ProfileScreen(padding, homeUiState, locationViewModel)
                     }
 
                     composable(Routes.Location.route) {

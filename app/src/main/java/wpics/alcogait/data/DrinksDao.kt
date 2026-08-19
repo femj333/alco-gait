@@ -18,6 +18,9 @@ interface DrinksDao {
     @Query("SELECT timestamp, drunk_state FROM drinks WHERE user_id = :userId AND latitude = :latitude AND longitude = :longitude")
     suspend fun getDateAndDrunkStateOfDrinksAtLocation(userId: Long, latitude: Float, longitude: Float): List<Pair<String, String?>>
 
+    @Query("SELECT COUNT(*) from drinks WHERE user_id = :userId AND drunk_state = :drunkState")
+    suspend fun getNumDrinksByDrunkState(userId: Long, drunkState: String): Int
+
     @Insert
     suspend fun insertDrink(drink: Drinks)
 }
