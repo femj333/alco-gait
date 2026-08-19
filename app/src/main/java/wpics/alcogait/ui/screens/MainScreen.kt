@@ -42,12 +42,25 @@ fun MainScreen(
 ) {
     var sessionChecked by remember { mutableStateOf(false) }
     var startDestination by remember { mutableStateOf(Routes.Login.route) }
+    var displayCharacter by remember { mutableStateOf(true) }
+    var playMusic by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
+        // try to log in the most recently logged in user
         homeViewModel.tryAutoLogin { success ->
             Log.d("MainScreen", "Autologin success: $success")
             startDestination = if (success) Routes.Home.route else Routes.Login.route
             sessionChecked = true
+        }
+
+        // get character display preference
+        homeViewModel.getCharacterDisplay { display ->
+            displayCharacter = display
+        }
+
+        // get music playing preference
+        homeViewModel.getMusicPreference { music ->
+            playMusic = music
         }
     }
 
@@ -64,8 +77,6 @@ fun MainScreen(
     val currentRoute = navBackStackEntry?.destination?.route
 
     var menuBarVisible by remember { mutableStateOf(false) }
-    var displayCharacter by remember { mutableStateOf(true) }
-    var playMusic by remember { mutableStateOf(true) }
     val density = LocalDensity.current
 
     val menuWidth = 340.dp
@@ -89,15 +100,21 @@ fun MainScreen(
         ) {
             MenuBar(
                 displayChecked = displayCharacter,
-                onDisplayCheckedChange = { displayCharacter = it },
+                onDisplayCheckedChange = {
+                    displayCharacter = it
+                    homeViewModel.saveCharacterDisplay(it)
+                },
                 musicChecked = playMusic,
                 onMusicCheckedChange = {
                     playMusic = it
+
                     if (playMusic) {
                         mediaPlayer.start()
                     } else {
                         mediaPlayer.pause()
                     }
+
+                    homeViewModel.saveLastMusicPreference(it)
                 },
                 navController = navController,
                 uiState = homeUiState,
