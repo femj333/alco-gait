@@ -7,16 +7,24 @@ import kotlin.math.sqrt
 
 class GaitAnalyzer {
     private val magnitudes = mutableListOf<Float>()
+    private val lock = Any()
 
     /** Add magnitude of one sample to the window */
     fun addSample(x: Float, y: Float, z: Float) {
-        magnitudes.add(sqrt(x * x + y * y + z * z))
+        synchronized(lock) {
+            magnitudes.add(sqrt(x * x + y * y + z * z))
+        }
     }
 
     /** Returns the current drunk state label and image */
     fun computeDrunkStateAndReset(): DrunkState? {
-        // no info
-        if (magnitudes.isEmpty()) return null
+        val snapshot: List<Float> = synchronized(lock) {
+            // no info
+            if (magnitudes.isEmpty()) return null
+            val copy = magnitudes.toList()
+            magnitudes.clear()
+            copy
+        }
 
         // compute variance of magnitudes-> in place of ML model
         val mean = magnitudes.average()
@@ -60,8 +68,6 @@ class GaitAnalyzer {
 
         val fontSize = if (label == "WASTED") 50 else 60
 
-        val drunkState = DrunkState(label, finePrint, image, fontSize, noCharacterText, noCharacterDrinks)
-        magnitudes.clear()
-        return drunkState
+        return DrunkState(label, finePrint, image, fontSize, noCharacterText, noCharacterDrinks)
     }
 }

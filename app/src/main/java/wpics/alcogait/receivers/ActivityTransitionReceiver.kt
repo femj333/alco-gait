@@ -40,7 +40,7 @@ class ActivityTransitionReceiver : BroadcastReceiver() {
                 ActivityTransition.ACTIVITY_TRANSITION_EXIT -> {
                     val serviceIntent = Intent(context, WalkTrackingService::class.java)
                         .setAction(WalkTrackingService.ACTION_STOP)
-                    ContextCompat.startForegroundService(context, serviceIntent)
+                    context.startService(serviceIntent)
                 }
             }
         }
