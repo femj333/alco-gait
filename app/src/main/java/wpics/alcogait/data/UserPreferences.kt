@@ -17,11 +17,16 @@ class UserPreferences(private val context: Context) {
 
     private val LAST_CHARACTER_DISPLAY = booleanPreferencesKey("last_character_display")
 
+    private val LAST_MUSIC_PREFERENCE = booleanPreferencesKey("last_music_preference")
+
     val lastUserId: Flow<String?> = context.dataStore.data
         .map { prefs -> prefs[LAST_USER_ID] }
 
     val lastCharacterDisplay: Flow<Boolean?> = context.dataStore.data
         .map { prefs -> prefs[LAST_CHARACTER_DISPLAY] }
+
+    val lastMusicPreference: Flow<Boolean?> = context.dataStore.data
+        .map { prefs -> prefs[LAST_MUSIC_PREFERENCE] }
 
     suspend fun saveLastUserId(userId: String) {
         Log.d("UserPreferences", "Saving last user id: $userId")
@@ -30,6 +35,10 @@ class UserPreferences(private val context: Context) {
 
     suspend fun saveLastCharacterDisplay(display: Boolean) {
         context.dataStore.edit { prefs -> prefs[LAST_CHARACTER_DISPLAY] = display }
+    }
+
+    suspend fun saveLastMusicPreference(music: Boolean) {
+        context.dataStore.edit { prefs -> prefs[LAST_MUSIC_PREFERENCE] = music }
     }
 
     suspend fun clearLastUserId() {

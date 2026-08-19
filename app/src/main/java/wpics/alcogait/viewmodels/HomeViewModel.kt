@@ -410,7 +410,20 @@ class HomeViewModel(
             if (display) onResult(true) else onResult(false)
             return@launch
         }
+    }
 
+    fun saveLastMusicPreference(music: Boolean) {
+        viewModelScope.launch {
+            userPreferences.saveLastMusicPreference(music)
+        }
+    }
+
+    fun getMusicPreference(onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val display = userPreferences.lastMusicPreference.first() ?: true
+            if (display) onResult(true) else onResult(false)
+            return@launch
+        }
     }
 
     @RequiresPermission(Manifest.permission.ACTIVITY_RECOGNITION)
