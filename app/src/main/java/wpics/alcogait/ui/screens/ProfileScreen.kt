@@ -322,17 +322,17 @@ fun Toggle(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.Black,
-                checkedTrackColor = LightPink,
-                uncheckedThumbColor = Color.Black,
-                uncheckedTrackColor = DarkBlue
+                checkedThumbColor = LightGray,
+                checkedTrackColor = DarkBlue,
+                uncheckedThumbColor = DarkBlue,
+                uncheckedTrackColor = LightGray
             )
         )
 
         Text(
             text = text,
-            color = LightPink,
-            fontSize = 22.sp
+            color = DarkBlue,
+            fontSize = 23.sp
         )
     }
 }
