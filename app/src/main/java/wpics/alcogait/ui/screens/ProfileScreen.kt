@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -86,7 +87,7 @@ fun ProfileScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(600.dp)
+                .height(230.dp)
         ) {
             // first name header
             homeUiState.currentUser?.firstName?.let {
@@ -99,8 +100,28 @@ fun ProfileScreen(
                 )
             }
 
-            // background
-            GrayBackground()
+            // background arc
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.2f)
+                    .background(LightGray)
+                    .align(Alignment.BottomCenter)
+            ) {
+                Canvas(modifier = Modifier
+                    .size(450.dp, height = 150.dp)
+
+                    .offset(y = (-45).dp)
+                ) {
+                    drawArc(
+                        color = LightGray,
+                        startAngle = 180f,
+                        sweepAngle = 180f,
+                        useCenter = true,
+                        size = Size(size.width, size.height * 2)
+                    )
+                }
+            }
 
             // profile icon
             Box(
@@ -134,8 +155,10 @@ fun ProfileScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .offset(y = (-550).dp)
-                .background(LightGray, RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                .background(
+                    LightGray,
+
+                )
                 .padding(10.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
@@ -428,28 +451,10 @@ fun SectionHeader(
 fun GrayBackground() {
     Box(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .fillMaxHeight(0.5f)
+            .background(Color.Yellow)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.65f)
-                .background(LightGray)
-                .align(Alignment.BottomCenter)
-        ) {
-            Canvas(modifier = Modifier
-                .size(450.dp, 150.dp)
-                .align(Alignment.TopCenter)
-                .offset(y = (-150).dp)
-            ) {
-                drawArc(
-                    color = LightGray,
-                    startAngle = 180f,
-                    sweepAngle = 180f,
-                    useCenter = true,
-                    size = Size(size.width, size.height * 2)
-                )
-            }
-        }
+
     }
 }
