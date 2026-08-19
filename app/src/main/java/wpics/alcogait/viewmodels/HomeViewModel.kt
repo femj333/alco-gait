@@ -398,6 +398,21 @@ class HomeViewModel(
         }
     }
 
+    fun saveCharacterDisplay(display: Boolean) {
+        viewModelScope.launch {
+            userPreferences.saveLastCharacterDisplay(display)
+        }
+    }
+
+    fun getCharacterDisplay(onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val display = userPreferences.lastCharacterDisplay.first() ?: true
+            if (display) onResult(true) else onResult(false)
+            return@launch
+        }
+
+    }
+
     @RequiresPermission(Manifest.permission.ACTIVITY_RECOGNITION)
     fun startWalkTracking() {
         val transitions = mutableListOf<ActivityTransition>()
