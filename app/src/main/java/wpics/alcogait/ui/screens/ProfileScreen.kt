@@ -17,9 +17,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -55,6 +64,8 @@ fun ProfileScreen(
     var numTipsy by remember { mutableIntStateOf(0) }
     var numDrunk by remember { mutableIntStateOf(0) }
     var numWasted by remember { mutableIntStateOf(0) }
+    var enablePushNotifications by remember { mutableStateOf(true) }
+    var enableEmailNotifications by remember { mutableStateOf(true) }
 
     LaunchedEffect(homeUiState.currentUser?.userId) {
         val userId = homeUiState.currentUser?.userId ?: return@LaunchedEffect
@@ -65,73 +76,85 @@ fun ProfileScreen(
         Log.d("Profile Screen", "Tipsy: $numTipsy, Drunk: $numDrunk, Wasted: $numWasted")
     }
 
-    Box(
+    Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .background(DarkBlue)
             .padding(padding)
+            .verticalScroll(rememberScrollState())
     ) {
-        // first name header
-        homeUiState.currentUser?.firstName?.let {
-            Text(
-                text = it,
-                color = LightPink,
-                fontSize = 40.sp,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-            )
-        }
-
-        // background
-        GrayBackground()
-
-        // profile icon
         Box(
             modifier = Modifier
-                .clickable(onClick = { /* TODO -> allow user to edit profile pic */})
-                .align(Alignment.TopCenter)
-                .offset(y = 90.dp)
+                .fillMaxWidth()
+                .height(600.dp)
         ) {
-            ProfileIcon(circleSize = 120, iconSize = 90)
+            // first name header
+            homeUiState.currentUser?.firstName?.let {
+                Text(
+                    text = it,
+                    color = LightPink,
+                    fontSize = 40.sp,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                )
+            }
 
-            // edit icon
+            // background
+            GrayBackground()
+
+            // profile icon
             Box(
                 modifier = Modifier
-                    .size(40.dp)
-                    .background(LightGray, CircleShape)
-                    .align(Alignment.TopEnd)
+                    .clickable(onClick = { /* TODO -> allow user to edit profile pic */ })
+                    .align(Alignment.TopCenter)
+                    .offset(y = 90.dp)
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.edit_icon),
-                    contentDescription = "Profile Icon",
-                    tint = DarkBlue,
+                ProfileIcon(circleSize = 120, iconSize = 90)
+
+                // edit icon
+                Box(
                     modifier = Modifier
-                        .size(30.dp)
-                        .align(Alignment.Center)
-                )
+                        .size(40.dp)
+                        .background(LightGray, CircleShape)
+                        .align(Alignment.TopEnd)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.edit_icon),
+                        contentDescription = "Profile Icon",
+                        tint = DarkBlue,
+                        modifier = Modifier
+                            .size(30.dp)
+                            .align(Alignment.Center)
+                    )
+                }
             }
         }
 
+        // profile information section
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.7f)
-                .align(Alignment.BottomCenter)
+                .offset(y = (-550).dp)
                 .background(LightGray, RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
                 .padding(10.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             SectionHeader("Drinking Statistics")
 
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(0.8f)
+                        .fillMaxWidth(0.95f)
                         .background(LightGray, RoundedCornerShape(10.dp))
-                        .border(width = 2.dp, color = DarkBlue, shape = RoundedCornerShape(10.dp))
+                        .border(
+                            width = 2.dp,
+                            color = DarkBlue,
+                            shape = RoundedCornerShape(10.dp)
+                        )
                         .align(Alignment.Center)
                 ) {
                     Row(
@@ -171,10 +194,194 @@ fun ProfileScreen(
 
             SectionHeader("Rideshare")
 
+            ColumnSection(
+                height = 110,
+                textContent1 = {
+                    Text(
+                        text = "Saved Locations",
+                        color = LightPink,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                },
+                textContent2 = {
+                    Text(
+                        text = "Add New Saved Location",
+                        color = LightPink,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            )
+
             SectionHeader("Contact Information")
 
+            ColumnSection(
+                height = 130,
+                textContent1 = {
+                    Column(
+                        modifier = Modifier,
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.spacedBy(
+                            space = 1.dp,
+                            alignment = Alignment.CenterVertically
+                        )
+                    ) {
+                        Text(
+                            text = "Email",
+                            color = LightPink,
+                            fontSize = 15.sp
+                        )
+
+                        Text(
+                            text = homeUiState.currentUser?.email ?: "Add email",
+                            color = LightPink,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                },
+                textContent2 = {
+                    Column(
+                        modifier = Modifier,
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.spacedBy(
+                            space = 1.dp,
+                            alignment = Alignment.CenterVertically
+                        ),
+                    ) {
+                        Text(
+                            text = "Phone Number",
+                            color = LightPink,
+                            fontSize = 15.sp
+                        )
+
+                        Text(
+                            text = homeUiState.currentUser?.phoneNumber ?: "Add phone number",
+                            color = LightPink,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+
+            )
+
             SectionHeader("Notifications")
+
+            Toggle(
+                text = "Push",
+                checked = enablePushNotifications,
+                onCheckedChange = { enablePushNotifications = it }
+            )
+
+            Toggle(
+                text = "Email",
+                checked = enableEmailNotifications,
+                onCheckedChange = { enableEmailNotifications = it }
+            )
         }
+    }
+}
+
+@Composable
+fun Toggle(
+    text: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.Black,
+                checkedTrackColor = LightPink,
+                uncheckedThumbColor = Color.Black,
+                uncheckedTrackColor = DarkBlue
+            )
+        )
+
+        Text(
+            text = text,
+            color = LightPink,
+            fontSize = 22.sp
+        )
+    }
+}
+
+@Composable
+fun ColumnSection(
+    height: Int,
+    textContent1: @Composable () -> Unit,
+    textContent2: @Composable () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.95f)
+                .background(DarkBlue, RoundedCornerShape(10.dp))
+                .padding(horizontal = 10.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                ClickableSection(
+                    onClick = {/* TODO */},
+                    textContent = { textContent1() },
+                    modifier = Modifier.weight(5f)
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth(0.99f)
+                        .weight(0.5f),
+                    color = LightPink
+                )
+
+                ClickableSection(
+                    onClick = {/* TODO */},
+                    textContent = { textContent2() },
+                    modifier = Modifier.weight(5f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ClickableSection(
+    onClick: () -> Unit,
+    textContent: @Composable () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = { onClick() }),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        textContent()
+
+        // arrow icon
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = "Arrow Icon",
+            tint = LightPink,
+            modifier = Modifier.size(35.dp)
+        )
     }
 }
 
