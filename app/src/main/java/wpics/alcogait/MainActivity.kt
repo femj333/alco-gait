@@ -38,6 +38,14 @@ class MainActivity : ComponentActivity() {
         } else {
             Log.d("MainActivity", "Activity recognition permission granted")
         }
+
+        val notificationPermissionsGranted = permissions[Manifest.permission.POST_NOTIFICATIONS] == true
+        if (!notificationPermissionsGranted) {
+            // permission denied
+            Log.d("MainActivity", "Notification permission denied")
+        } else {
+            Log.d("MainActivity", "Notification permission granted")
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +58,8 @@ class MainActivity : ComponentActivity() {
         permissionLauncher.launch(arrayOf(
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACTIVITY_RECOGNITION
+            Manifest.permission.ACTIVITY_RECOGNITION,
+            Manifest.permission.POST_NOTIFICATIONS
         ))
 
         setContent {
